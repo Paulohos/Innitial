@@ -67,6 +67,13 @@
         "identifier" : "NetworkLayerTests",
         "name" : "NetworkLayerTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Models\/DesignSystem",
+        "identifier" : "DesignSystemTests",
+        "name" : "DesignSystemTests"
+      }
     }
   ],
   "version" : 1
