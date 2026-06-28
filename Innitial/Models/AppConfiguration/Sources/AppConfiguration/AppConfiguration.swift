@@ -1,6 +1,6 @@
 import Foundation
 
-public struct EnvironmentConfigurationService: Sendable{
+public struct EnvironmentConfigurationService: Sendable {
     public let baseUrl: @Sendable () -> String
     public let bundleID: @Sendable () -> String
     public let termsOfUse: @Sendable () -> String
@@ -18,6 +18,15 @@ extension EnvironmentConfigurationService {
 
     public static func live(bundle: Bundle = .main) -> Self {
         let settings = bundle.infoDictionary?["EnviromentSetting"] as? [String: Any] ?? [:]
+        return .live(settings: settings, releaseVersionNumber: bundle.releaseVersionNumber ?? "")
+    }
+
+    /// Builds the configuration from an already-extracted settings dictionary.
+    /// Kept `internal` so tests can exercise the parsing without a real `Bundle`.
+    ///
+    /// The `String` values are resolved up front (not captured as `Any`) so the
+    /// `@Sendable` accessor closures only capture `Sendable` `String`s.
+    static func live(settings: [String: Any], releaseVersionNumber: String) -> Self {
         func value(_ name: String) -> String { settings[name] as? String ?? "" }
 
         let baseUrl = value("baseURL")
@@ -25,7 +34,6 @@ extension EnvironmentConfigurationService {
         let termsOfUse = value("termsOfUseURL")
         let privacyPolicy = value("privacyPolicyUrl")
         let appStoreURL = value("appStoreURL")
-        let releaseVersionNumber = bundle.releaseVersionNumber ?? ""
 
         return .init(
             baseUrl: { baseUrl },
@@ -41,7 +49,7 @@ extension EnvironmentConfigurationService {
             // computed live so it reflects the device's current time zone
             timeZoneIdentifier: { TimeZone.current.identifier }
         )
-   }
+    }
 
 
     public static func mock(

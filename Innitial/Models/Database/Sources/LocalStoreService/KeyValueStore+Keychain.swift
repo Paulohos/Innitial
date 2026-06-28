@@ -59,6 +59,9 @@ extension KeyValueStore {
                 case errSecItemNotFound:
                     var insert = query
                     insert[kSecValueData as String] = data
+                    // Tokens/secrets: readable after first unlock (so background refresh works)
+                    // but never synced to iCloud Keychain and bound to this device only.
+                    insert[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
                     let addStatus = SecItemAdd(insert as CFDictionary, nil)
                     guard addStatus == errSecSuccess else {
                         throw KeychainError.unexpectedStatus(addStatus)
