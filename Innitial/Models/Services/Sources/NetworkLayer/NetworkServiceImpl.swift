@@ -11,16 +11,16 @@ extension NetworkService {
     ///
     /// - Parameters:
     ///   - appConfiguration: AppConfiguration dependency
-    ///   - localStorageService: LocalStorageService dependency
+    ///   - localStore: LocalStoreService dependency
     ///   - notifiersService: NotifiersService dependency
     /// - Returns: A live `NetworkService`
     public static func live(
         appConfiguration: EnvironmentConfigurationService,
-        localStorageService: LocalStoreService
+        localStore: LocalStoreService
     ) -> NetworkService {
         .init(
             appConfiguration: appConfiguration,
-            localStorageService: localStorageService,
+            localStore: localStore,
             baseNetworkRequest: {
                 return try await URLSession.shared.data(for: $0)
             }
@@ -30,12 +30,12 @@ extension NetworkService {
     /// This is for testing the live network service; it gives us an opportunity to capture the `URLRequest` that's sent so we can test on it
     static func testMock(
         appConfiguration: EnvironmentConfigurationService,
-        localStorageService: LocalStoreService,
+        localStore: LocalStoreService,
         mockValueProvider: @escaping @Sendable (URLRequest) -> NetworkResponse
     ) -> NetworkService {
         .init(
             appConfiguration: appConfiguration,
-            localStorageService: localStorageService,
+            localStore: localStore,
             baseNetworkRequest: { request in
                 switch mockValueProvider(request) {
                 case .success(let value): return value

@@ -35,7 +35,11 @@ private extension NetworkService {
                 /// This project adheres to a standard error structure for errors falling within the range of 400 to 499,
                 /// such as {code: 123, title: "Oops... something went wrong", message: "Email or password invalid"}.
                 var defaultError = try JSONDecoder().decode(DefaultError.self, from: data)
-                defaultError.code = status
+                // Preserve the server's business error code (e.g. 123 = "invalid password").
+                // Only fall back to the HTTP status when the body didn't carry one.
+                if defaultError.code == .zero {
+                    defaultError.code = status
+                }
                 errorHandle = NetworkServiceError.defaultError(defaultError)
             } catch {
                 errorHandle = handleErrorReturns(
@@ -51,14 +55,14 @@ private extension NetworkService {
     private func wrapInErrorLogger<R>(for endpoint: Endpoint, function: () async throws -> R) async throws -> R {
         do {
             let value = try await function()
-            print("\(endpoint) 🌐 Call succeeded! ✅")
+            logger.debug("\(String(describing: endpoint)) 🌐 Call succeeded! ✅")
             return value
         } catch is CancellationError {
-            print("\(endpoint) 🌐 CancellationError ❌")
+            logger.notice("\(String(describing: endpoint)) 🌐 CancellationError ❌")
             throw NetworkServiceError.cancelledRequest
         }
         catch {
-            print("\(endpoint) 🌐 Call failed with error: \(error) ❌")
+            logger.error("\(String(describing: endpoint)) 🌐 Call failed with error: \(error) ❌")
             throw error
         }
     }
@@ -76,7 +80,7 @@ extension NetworkService {
         try await wrapInErrorLogger(for: endpoint) {
             let data = try await callAsync(
                 endpoint: endpoint,
-                body: body?.asData,
+                body: try body?.asData(),
                 additionalSettings: additionalSettings,
                 shouldReturnDefaultError: shouldReturnDefaultError
             )
@@ -101,7 +105,7 @@ extension NetworkService {
         try await wrapInErrorLogger(for: endpoint) {
             _ = try await callAsync(
                 endpoint: endpoint,
-                body: body?.asData,
+                body: try body?.asData(),
                 additionalSettings: additionalSettings,
                 shouldReturnDefaultError: shouldReturnDefaultError
             )

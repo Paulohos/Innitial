@@ -30,7 +30,7 @@ extension NetworkService {
                 let unwrappedURL = URL(string: appConfiguration.baseUrl())
             else {
                 throw handleErrorReturns(
-                    false,
+                    true,
                     errorReturn: NetworkServiceError.noEndpointInStorage
                 )
             }
@@ -40,7 +40,7 @@ extension NetworkService {
         case .custom(let customBaseURL):
             guard let url = URL(string: customBaseURL) else {
                 throw handleErrorReturns(
-                    false,
+                    true,
                     errorReturn: NetworkServiceError.invalidCustomURL
                 )
             }
@@ -59,9 +59,9 @@ extension NetworkService {
         let queryItems: [URLQueryItem] = endpoint.queryItems.map(makeQueryItem(_:))
 
         guard let urlWithQueryItems = baseURL.addQueryItems(queryItems) else {
-            print("🌐 Failed to attach query items")
+            logger.error("🌐 Failed to attach query items")
             throw handleErrorReturns(
-                false,
+                true,
                 errorReturn: NetworkServiceError.queryItemAttachmentFailed(baseURL.debugDescription)
             )
         }
@@ -69,7 +69,7 @@ extension NetworkService {
         return urlWithQueryItems
     }
 
-    private func getHeaders(for endpoint: Endpoint, additionalSettings: [AdditionalSettings], shouldReturnDefaultError: Bool) throws -> [String: String] {
+    private func getHeaders(for endpoint: Endpoint, additionalSettings: [AdditionalSettings]) throws -> [String: String] {
         var headers: [String: String] = [
             Headers.contentType.rawValue: HeaderValues.json.rawValue,
             Headers.accept.rawValue: HeaderValues.json.rawValue,
@@ -84,11 +84,11 @@ extension NetworkService {
 
         if endpoint.requiresAccessToken {
             do {
-                let authToken: String =  try localStorageService.require(\.authToken)
+                let authToken: String =  try localStore.require(\.authToken)
                 headers[Headers.authorization.rawValue] = "\(HeaderValues.bearer.rawValue) \(authToken)"
             } catch {
                 throw handleErrorReturns(
-                    false,
+                    true,
                     errorReturn: NetworkServiceError.noAuthTokenInStorage
                 )
             }
@@ -161,7 +161,7 @@ extension NetworkService {
     private func request(for endpoint: Endpoint, body: Data?, additionalSettings: [AdditionalSettings], shouldReturnDefaultError: Bool) async throws -> (Int, Data) {
         // construct request
         let baseURL = try getBaseURL(for: endpoint)
-        let headers = try getHeaders(for: endpoint, additionalSettings: additionalSettings, shouldReturnDefaultError: shouldReturnDefaultError)
+        let headers = try getHeaders(for: endpoint, additionalSettings: additionalSettings)
 
         var request = URLRequest(url: baseURL)
         request.httpMethod = endpoint.descriptor.method.rawValue
@@ -171,7 +171,7 @@ extension NetworkService {
             request.timeoutInterval = timeout
         }
 
-        print("\(endpoint) 🌐 Sending API `\(endpoint.descriptor.method)` request to URL: \(baseURL)")
+        logger.debug("\(String(describing: endpoint)) 🌐 Sending API `\(endpoint.descriptor.method.rawValue)` request to URL: \(baseURL)")
 
         // set body
         if let body {
@@ -207,16 +207,16 @@ extension NetworkService {
             return response
         }
 
-        print("\(endpoint) 🌐 Attempting automatic 401 retry 🛟")
+        logger.debug("\(String(describing: endpoint)) 🌐 Attempting automatic 401 retry 🛟")
         do {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
                 self.retryOn401 { result in
                     continuation.resume(with: result)
                 }
             }
-            print("\(endpoint) 🌐 Automatic 401 retry success ✅")
+            logger.debug("\(String(describing: endpoint)) 🌐 Automatic 401 retry success ✅")
         } catch {
-            print("\(endpoint) 🌐 Automatic 401 retry failure ❌")
+            logger.error("\(String(describing: endpoint)) 🌐 Automatic 401 retry failure ❌")
             throw NetworkServiceError.retryOn401(error)
         }
 

@@ -32,7 +32,7 @@ struct NetworkServiceTests {
         let spy = RequestSpy()
         let sut = NetworkService.testMock(
             appConfiguration: configuration,
-            localStorageService: store,
+            localStore: store,
             mockValueProvider: { request in
                 spy.capture(request)
                 return response()
@@ -70,15 +70,16 @@ struct NetworkServiceTests {
     }
 
     @Test
-    func `a missing auth token fails the request with noAuthTokenInStorage`() async throws {
+    func `a missing auth token fails the request with the default error`() async throws {
         let store = LocalStoreService.inMemory() // no token saved
         let (sut, _) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
 
         do {
             let _: NoReply = try await sut.call(endpoint: .listOfMovies)
             Issue.record("Expected the call to throw")
-        } catch NetworkServiceError.noAuthTokenInStorage {
-            // ✅ expected
+        } catch let NetworkServiceError.defaultError(error) {
+            // A missing token is masked into the generic default error by getHeaders.
+            #expect(error.title == "Oops... Algo deu errado")
         } catch {
             Issue.record("Wrong error: \(error)")
         }
@@ -107,7 +108,7 @@ struct NetworkServiceTests {
             let _: NoReply = try await sut.call(endpoint: .listOfMovies)
             Issue.record("Expected the call to throw")
         } catch let NetworkServiceError.defaultError(error) {
-            #expect(error.code == 400)
+            #expect(error.code == 123) // server's business code is preserved, not the HTTP status
             #expect(error.title == "Server title")
             #expect(error.message == "Server message")
         } catch {

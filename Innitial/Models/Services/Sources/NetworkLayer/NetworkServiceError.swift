@@ -12,6 +12,7 @@ public enum NetworkServiceError: Error {
     case defaultError(DefaultError)
     case invalidCustomURL
     case jsonParsingFailure
+    case bodyEncodingFailure(Error)
     case cancelledRequest
     case failToRefreshToken
 }
@@ -54,6 +55,9 @@ extension NetworkServiceError: CustomDebugStringConvertible {
 
         case .jsonParsingFailure:
             debugMessage = "Failure to parsing JSON"
+
+        case .bodyEncodingFailure(let error):
+            debugMessage = "Failed to encode the request body: \(error)"
 
         case .cancelledRequest:
             debugMessage = "The request was cancelled"

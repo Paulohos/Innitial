@@ -13,7 +13,7 @@ extension NetworkService {
     ///     var networkServiceResponse: NetworkResponse!
     ///     var networkService = NetworkService.mock(
     ///         appConfiguration: appConfiguration,
-    ///         localStorageService: localStorageService,
+    ///         localStore: localStore,
     ///         mockValueProvider: { self.networkServiceResponse }
     ///     )
     ///
@@ -45,20 +45,20 @@ extension NetworkService {
     /// var mockValueQueue: [NetworkResponse] = [...]
     /// var networkService = NetworkService.mock(
     ///     appConfiguration: appConfiguration,
-    ///     localStorageService: localStorageService,
+    ///     localStore: localStore,
     ///        mockValueProvider: { mockValueQueue.removeFirst() }
     ///    )
     /// ```
     ///
     /// - Parameters:
     ///   - appConfiguration: AppConfiguration dependency
-    ///   - localStorageService: LocalStorageService dependency
+    ///   - localStore: LocalStoreService dependency
     ///   - notifiersService: NotifiersService dependency
     ///   - mockValueProvider: A mechanism through which mock values can be passed to the network service.
     /// - Returns: A NetworkService mock object
     public static func mock(
         appConfiguration: EnvironmentConfigurationService,
-        localStorageService: LocalStoreService,
+        localStore: LocalStoreService,
         mockValueProvider: @escaping @Sendable () -> NetworkResponse = {
             .success((Data(), HTTPURLResponse(
                 url: URL(string: "https://mock.local")!,
@@ -67,7 +67,7 @@ extension NetworkService {
     ) -> NetworkService {
         .init(
             appConfiguration: appConfiguration,
-            localStorageService: localStorageService,
+            localStore: localStore,
             baseNetworkRequest: { _ in
                 switch mockValueProvider() {
                 case .success(let value): return value

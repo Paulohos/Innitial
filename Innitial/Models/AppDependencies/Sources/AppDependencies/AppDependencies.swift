@@ -33,7 +33,7 @@ extension AppDependencies {
         return .init(
             configuration: configuration,
             localStore: localStore,
-            network: NetworkService.live(appConfiguration: configuration, localStorageService: localStore)
+            network: NetworkService.live(appConfiguration: configuration, localStore: localStore)
         )
     }
 
@@ -44,7 +44,7 @@ extension AppDependencies {
         return .init(
             configuration: configuration,
             localStore: localStore,
-            network: NetworkService.mock(appConfiguration: configuration, localStorageService: localStore)
+            network: NetworkService.mock(appConfiguration: configuration, localStore: localStore)
         )
     }
 }

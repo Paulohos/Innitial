@@ -1,5 +1,16 @@
 import Foundation
 
 extension Encodable {
-    var asData: Data? { try? JSONEncoder().encode(self) }
+    /// Encodes the value into JSON `Data`.
+    ///
+    /// Throws `NetworkServiceError.bodyEncodingFailure` instead of silently
+    /// returning `nil`, so an unencodable body fails the request loudly rather
+    /// than being sent as a request with no body.
+    func asData() throws -> Data {
+        do {
+            return try JSONEncoder().encode(self)
+        } catch {
+            throw NetworkServiceError.bodyEncodingFailure(error)
+        }
+    }
 }

@@ -10,7 +10,7 @@ extension Endpoint {
     var path: String {
         switch self {
         case .listOfMovies:
-            return "/auth/refresh-token"
+            return "/movie/popular"
         case .movieDetails(let id):
             return "/movies/\(id)"
         }
