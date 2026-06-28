@@ -19,6 +19,28 @@ struct NetworkServiceTests {
         func capture(_ request: URLRequest) { lock.lock(); defer { lock.unlock() }; stored = request }
     }
 
+    /// Serves a scripted list of responses, one per request, sticking on the last
+    /// once exhausted. Lets us model multi-request flows (e.g. 401 then 200).
+    private final class ResponseSequence: @unchecked Sendable {
+        private let lock = NSLock()
+        private let responses: [NetworkResponse]
+        private var index = 0
+        private var calls = 0
+
+        init(_ responses: [NetworkResponse]) { self.responses = responses }
+
+        /// How many times a response has been requested so far.
+        var callCount: Int { lock.lock(); defer { lock.unlock() }; return calls }
+
+        func next() -> NetworkResponse {
+            lock.lock(); defer { lock.unlock() }
+            calls += 1
+            let response = responses[min(index, responses.count - 1)]
+            index += 1
+            return response
+        }
+    }
+
     private func makeSUT(
         configuration: EnvironmentConfigurationService = .mock(
             baseUrl: "https://api.test",
@@ -67,6 +89,19 @@ struct NetworkServiceTests {
         #expect(headers["timeZoneIdentifier"] == "America/Sao_Paulo")
         #expect(headers["source"] == "innitial")
         #expect(headers["Authorization"] == "Bearer abc123")
+    }
+
+    @Test
+    func `the requestedAt header is an ISO 8601 UTC timestamp`() async throws {
+        let store = try storeWithToken()
+        let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
+
+        let _: NoReply = try await sut.call(endpoint: .listOfMovies)
+
+        let requestedAt = try #require(spy.request?.allHTTPHeaderFields?["requestedAt"])
+        // e.g. "2023-07-21T17:19:29.744Z"
+        let pattern = #/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/#
+        #expect(requestedAt.wholeMatch(of: pattern) != nil, "Unexpected format: \(requestedAt)")
     }
 
     @Test
@@ -212,6 +247,86 @@ struct NetworkServiceTests {
         }
     }
 
+    @Test
+    func `a 401 whose retry succeeds re-runs the request and returns the value`() async throws {
+        let store = try storeWithToken()
+        // First attempt is rejected with 401; after the retry handler succeeds the
+        // request is replayed and the second response (200) is what we get back.
+        let responses = ResponseSequence([
+            .mock(status: 401),
+            .mock(data: dummyMock, status: 200)
+        ])
+        var sut = makeSUT(store: store) { responses.next() }.sut
+        sut.setRetryOn401 { completion in completion(.success(())) }
+
+        let result: Dummy = try await sut.call(endpoint: .listOfMovies)
+
+        #expect(result == Dummy(dummy: "dummy"))
+        #expect(responses.callCount == 2) // original attempt + replay
+    }
+
+    // MARK: - URL building
+
+    @Test
+    func `listOfMovies hits the popular movies path`() async throws {
+        let store = try storeWithToken()
+        let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
+
+        let _: NoReply = try await sut.call(endpoint: .listOfMovies)
+
+        let url = try #require(spy.request?.url)
+        #expect(url.absoluteString.hasSuffix("/movie/popular"))
+        #expect(url.query == nil)
+    }
+
+    @Test
+    func `movieDetails carries the id in the path and not the query`() async throws {
+        let store = try storeWithToken()
+        let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
+
+        let _: NoReply = try await sut.call(endpoint: .movieDetails(id: 42))
+
+        let url = try #require(spy.request?.url)
+        #expect(url.absoluteString.hasSuffix("/movies/42"))
+        #expect(url.query == nil)
+    }
+
+    // MARK: - Body
+
+    @Test
+    func `a request body is JSON encoded and attached to the request`() async throws {
+        let store = try storeWithToken()
+        let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
+
+        let _: NoReply = try await sut.call(endpoint: .listOfMovies, body: Dummy(dummy: "hello"))
+
+        let body = try #require(spy.request?.httpBody)
+        let decoded = try JSONDecoder().decode(Dummy.self, from: body)
+        #expect(decoded == Dummy(dummy: "hello"))
+    }
+
+    @Test
+    func `a request without a body sends no http body`() async throws {
+        let store = try storeWithToken()
+        let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
+
+        let _: NoReply = try await sut.call(endpoint: .listOfMovies)
+
+        #expect(spy.request?.httpBody == nil)
+    }
+
+    // MARK: - Discardable overload
+
+    @Test
+    func `the discardable call overload sends the request without returning a value`() async throws {
+        let store = try storeWithToken()
+        let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
+
+        try await sut.call(endpoint: .listOfMovies)
+
+        #expect(spy.request != nil)
+    }
+
     // MARK: - Additional settings
 
     @Test
@@ -229,6 +344,21 @@ struct NetworkServiceTests {
         #expect(headers["Authorization"] == "Bearer abc123")
         #expect(headers["test"] == "test1")
         #expect(headers["test2"] == "test3")
+    }
+
+    @Test
+    func `appendHeader can override a standard header without duplicating it`() async throws {
+        let store = try storeWithToken("abc123")
+        let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
+
+        let _: NoReply = try await sut.call(
+            endpoint: .listOfMovies,
+            additionalSettings: [.appendHeader([["Authorization": "Bearer overridden"]])]
+        )
+
+        // setValue (not addValue) means the value is replaced, not comma-appended.
+        let headers = try #require(spy.request?.allHTTPHeaderFields)
+        #expect(headers["Authorization"] == "Bearer overridden")
     }
 
     @Test

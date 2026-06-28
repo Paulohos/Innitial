@@ -5,7 +5,7 @@ let dummyMock = Data("""
 { "dummy": "dummy" }
 """.utf8)
 
-struct Dummy: Decodable, Equatable {
+struct Dummy: Codable, Equatable {
     var dummy: String
 }
 
