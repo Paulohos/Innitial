@@ -41,6 +41,14 @@ let package = Package(
             name: "ServicesTests",
             dependencies: ["Services"]
         ),
+        .testTarget(
+            name: "NetworkLayerTests",
+            dependencies: [
+                "NetworkLayer",
+                .product(name: "AppConfiguration", package: "AppConfiguration"),
+                .product(name: "LocalStoreService", package: "Database"),
+            ]
+        ),
     ],
     swiftLanguageModes: [.v6]
 )
