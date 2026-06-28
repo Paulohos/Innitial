@@ -5,7 +5,7 @@
 //  Created by Paulo Henrique Oliveira Souza on 27/06/26.
 //
 
-import Observation
+import Foundation
 import LocalStoreService
 
 @MainActor

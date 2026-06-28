@@ -14,7 +14,7 @@ extension LocalStoreService {
     /// written to the file-system backend.
     public func cacheResponse(_ data: Data, for url: URL, now: Date = Date()) throws {
         let envelope = CachedResponse(data: data, storedAt: now)
-        let encoded = try JSONEncoder().encode(envelope)
+        let encoded = try sharedJSONEncoder.encode(envelope)
         try fileSystem.saveData(encoded, url.absoluteString)
     }
 
@@ -26,7 +26,7 @@ extension LocalStoreService {
         now: Date = Date()
     ) throws -> Data? {
         guard let encoded = try fileSystem.loadData(url.absoluteString) else { return nil }
-        let envelope = try JSONDecoder().decode(CachedResponse.self, from: encoded)
+        let envelope = try sharedJSONDecoder.decode(CachedResponse.self, from: encoded)
 
         guard now.timeIntervalSince(envelope.storedAt) <= maxAge else {
             try removeCachedResponse(for: url)   // stale → drop it
@@ -41,10 +41,10 @@ extension LocalStoreService {
         for url: URL,
         maxAge: TimeInterval,
         now: Date = Date(),
-        decoder: JSONDecoder = JSONDecoder()
+        decoder: JSONDecoder? = nil
     ) throws -> T? {
         guard let data = try cachedResponseData(for: url, maxAge: maxAge, now: now) else { return nil }
-        return try decoder.decode(T.self, from: data)
+        return try (decoder ?? sharedJSONDecoder).decode(T.self, from: data)
     }
 
     /// Removes any cached response for `url`.

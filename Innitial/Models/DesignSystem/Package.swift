@@ -4,35 +4,27 @@
 import PackageDescription
 
 let package = Package(
-    name: "AppDependencies",
+    name: "DesignSystem",
     platforms: [
-        .iOS(.v16),
-        .macOS(.v13),
+        .iOS(.v17),
+        .macOS(.v14),
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "AppDependencies",
-            targets: ["AppDependencies"]
+            name: "DesignSystem",
+            targets: ["DesignSystem"]
         ),
-    ],
-    dependencies: [
-        .package(path: "../AppConfiguration"),
-        .package(path: "../Database"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "AppDependencies",
-            dependencies: [
-                .product(name: "AppConfiguration", package: "AppConfiguration"),
-                .product(name: "LocalStoreService", package: "Database"),
-            ]
+            name: "DesignSystem"
         ),
         .testTarget(
-            name: "AppDependenciesTests",
-            dependencies: ["AppDependencies"]
+            name: "DesignSystemTests",
+            dependencies: ["DesignSystem"]
         ),
     ],
     swiftLanguageModes: [.v6]

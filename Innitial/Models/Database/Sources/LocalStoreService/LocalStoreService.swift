@@ -73,8 +73,9 @@ extension LocalStoreService {
     /// Use for keys that must exist in context (e.g. the auth token on an
     /// authenticated request).
     public func require<Value>(_ keyPath: KeyPath<StorageKeys, StorageKey<Value>>) throws -> Value {
-        guard let value = try load(keyPath) else {
-            throw LocalStoreError.valueNotFound(key: StorageKeys()[keyPath: keyPath].name)
+        let key = StorageKeys()[keyPath: keyPath]
+        guard let value = try store(for: key.backend).value(Value.self, forKey: key.name) else {
+            throw LocalStoreError.valueNotFound(key: key.name)
         }
         return value
     }

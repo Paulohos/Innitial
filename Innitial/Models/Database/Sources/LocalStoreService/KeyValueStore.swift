@@ -1,5 +1,10 @@
 import Foundation
 
+/// Shared JSON coders for the storage layer, reused instead of allocating a new
+/// coder on every read/write. `JSONEncoder`/`JSONDecoder` are `Sendable`.
+let sharedJSONEncoder = JSONEncoder()
+let sharedJSONDecoder = JSONDecoder()
+
 /// Low-level, single-backend key/value engine in the "struct of closures" style.
 ///
 /// `KeyValueStore` operates over raw `Data` so the same type can back different
@@ -43,19 +48,19 @@ extension KeyValueStore {
     public func value<Value: Decodable>(
         _ type: Value.Type = Value.self,
         forKey key: String,
-        decoder: JSONDecoder = JSONDecoder()
+        decoder: JSONDecoder? = nil
     ) throws -> Value? {
         guard let data = try loadData(key) else { return nil }
-        return try decoder.decode(Value.self, from: data)
+        return try (decoder ?? sharedJSONDecoder).decode(Value.self, from: data)
     }
 
     /// Encodes `value` and stores it under `key`.
     public func set<Value: Encodable>(
         _ value: Value,
         forKey key: String,
-        encoder: JSONEncoder = JSONEncoder()
+        encoder: JSONEncoder? = nil
     ) throws {
-        let data = try encoder.encode(value)
+        let data = try (encoder ?? sharedJSONEncoder).encode(value)
         try saveData(data, key)
     }
 

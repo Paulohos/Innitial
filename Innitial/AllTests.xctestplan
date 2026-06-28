@@ -1,0 +1,80 @@
+{
+  "configurations" : [
+    {
+      "id" : "21EEA2F9-9441-4E11-B1B0-F93A670A4D1F",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Models\/Database",
+        "identifier" : "DatabaseTests",
+        "name" : "DatabaseTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Models\/AppDependencies",
+        "identifier" : "AppDependenciesTests",
+        "name" : "AppDependenciesTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Models\/Features",
+        "identifier" : "FeaturesTests",
+        "name" : "FeaturesTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Models\/Core",
+        "identifier" : "CoreTests",
+        "name" : "CoreTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Models\/AnalyticsKit",
+        "identifier" : "AnalyticsKitTests",
+        "name" : "AnalyticsKitTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Models\/AppConfiguration",
+        "identifier" : "AppConfigurationTests",
+        "name" : "AppConfigurationTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Models\/Services",
+        "identifier" : "ServicesTests",
+        "name" : "ServicesTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Models\/Services",
+        "identifier" : "NetworkLayerTests",
+        "name" : "NetworkLayerTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Models\/DesignSystem",
+        "identifier" : "DesignSystemTests",
+        "name" : "DesignSystemTests"
+      }
+    }
+  ],
+  "version" : 1
+}

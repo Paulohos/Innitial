@@ -19,9 +19,14 @@ let package = Package(
             name: "Login",
             targets: ["Login"]
         ),
+        .library(
+            name: "Home",
+            targets: ["Home"]
+        ),
     ],
     dependencies: [
         .package(path: "../Database"),
+        .package(path: "../DesignSystem"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -33,6 +38,13 @@ let package = Package(
             name: "Login",
             dependencies: [
                 .product(name: "LocalStoreService", package: "Database"),
+            ]
+        ),
+        .target(
+            name: "Home",
+            dependencies: [
+                .product(name: "LocalStoreService", package: "Database"),
+                .product(name: "DesignSystem", package: "DesignSystem"),
             ]
         ),
         .testTarget(
