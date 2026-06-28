@@ -12,10 +12,6 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "Features",
-            targets: ["Features"]
-        ),
-        .library(
             name: "Home",
             targets: ["Home"]
         ),
@@ -29,9 +25,6 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "Features"
-        ),
-        .target(
             name: "Home",
             dependencies: [
                 .product(name: "LocalStoreService", package: "Database"),
@@ -42,7 +35,6 @@ let package = Package(
         .testTarget(
             name: "FeaturesTests",
             dependencies: [
-                "Features",
                 "Home",
                 .product(name: "MovieListService", package: "Services"),
             ]

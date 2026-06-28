@@ -4,6 +4,7 @@
 //
 //  Created by Paulo Henrique Oliveira Souza on 28/06/26.
 //
+import Foundation
 import NetworkLayer
 
 public struct MovieListService: Sendable {
@@ -34,3 +35,12 @@ extension MovieListService {
         )
     }
 }
+
+#if DEBUG
+extension MovieListService {
+    /// A mock whose fetch always throws — for testing error paths.
+    public static func failing(_ error: Error = URLError(.notConnectedToInternet)) -> Self {
+        .init(fetchListOfPopularMovies: { _ in throw error })
+    }
+}
+#endif
