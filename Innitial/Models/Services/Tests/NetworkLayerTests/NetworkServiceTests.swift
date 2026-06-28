@@ -49,12 +49,16 @@ struct NetworkServiceTests {
             timeZoneIdentifier: "America/Sao_Paulo"
         ),
         store: LocalStoreService,
+        retryOn401: @Sendable @escaping (@escaping (Result<Void, Error>) -> Void) -> Void = { completion in
+            completion(.failure(NetworkServiceError.authenticationFailure))
+        },
         response: @escaping @Sendable () -> NetworkResponse
     ) -> (sut: NetworkService, spy: RequestSpy) {
         let spy = RequestSpy()
         let sut = NetworkService.testMock(
             appConfiguration: configuration,
             localStore: store,
+            retryOn401: retryOn401,
             mockValueProvider: { request in
                 spy.capture(request)
                 return response()
@@ -256,8 +260,11 @@ struct NetworkServiceTests {
             .mock(status: 401),
             .mock(data: dummyMock, status: 200)
         ])
-        var sut = makeSUT(store: store) { responses.next() }.sut
-        sut.setRetryOn401 { completion in completion(.success(())) }
+        // The refresh handler is injected at construction (it just succeeds here).
+        let (sut, _) = makeSUT(
+            store: store,
+            retryOn401: { completion in completion(.success(())) }
+        ) { responses.next() }
 
         let result: Dummy = try await sut.call(endpoint: .listOfMovies)
 

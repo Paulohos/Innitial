@@ -12,15 +12,20 @@ extension NetworkService {
     /// - Parameters:
     ///   - appConfiguration: AppConfiguration dependency
     ///   - localStore: LocalStoreService dependency
-    ///   - notifiersService: NotifiersService dependency
+    ///   - retryOn401: Optional 401 refresh handler. Defaults to one that fails, so 401s
+    ///     are treated as hard authentication failures unless the composition root injects one.
     /// - Returns: A live `NetworkService`
     public static func live(
         appConfiguration: EnvironmentConfigurationService,
-        localStore: LocalStoreService
+        localStore: LocalStoreService,
+        retryOn401: @Sendable @escaping (@escaping (Result<Void, Error>) -> Void) -> Void = { completion in
+            completion(.failure(NetworkServiceError.authenticationFailure))
+        }
     ) -> NetworkService {
         .init(
             appConfiguration: appConfiguration,
             localStore: localStore,
+            retryOn401: retryOn401,
             baseNetworkRequest: {
                 return try await URLSession.shared.data(for: $0)
             }
@@ -31,11 +36,15 @@ extension NetworkService {
     static func testMock(
         appConfiguration: EnvironmentConfigurationService,
         localStore: LocalStoreService,
+        retryOn401: @Sendable @escaping (@escaping (Result<Void, Error>) -> Void) -> Void = { completion in
+            completion(.failure(NetworkServiceError.authenticationFailure))
+        },
         mockValueProvider: @escaping @Sendable (URLRequest) -> NetworkResponse
     ) -> NetworkService {
         .init(
             appConfiguration: appConfiguration,
             localStore: localStore,
+            retryOn401: retryOn401,
             baseNetworkRequest: { request in
                 switch mockValueProvider(request) {
                 case .success(let value): return value

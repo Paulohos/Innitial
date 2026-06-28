@@ -46,6 +46,9 @@ extension NetworkService {
     public static func mock(
         appConfiguration: EnvironmentConfigurationService,
         localStore: LocalStoreService,
+        retryOn401: @Sendable @escaping (@escaping (Result<Void, Error>) -> Void) -> Void = { completion in
+            completion(.failure(NetworkServiceError.authenticationFailure))
+        },
         mockValueProvider: @escaping @Sendable () -> NetworkResponse = {
             .success((Data(), HTTPURLResponse(
                 url: URL(string: "https://mock.local")!,
@@ -55,6 +58,7 @@ extension NetworkService {
         .init(
             appConfiguration: appConfiguration,
             localStore: localStore,
+            retryOn401: retryOn401,
             baseNetworkRequest: { _ in
                 switch mockValueProvider() {
                 case .success(let value): return value
