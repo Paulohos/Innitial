@@ -1,0 +1,57 @@
+## Build artifacts
+.build/
+DerivedData/
+build/
+*.o
+*.swiftmodule
+
+## Swift Package Manager
+.swiftpm/
+Package.resolved
+.netrc
+
+## Xcode - user-specific
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+
+## Xcode - per-user schemes (keep shared schemes in xcshareddata/)
+**/xcschememanagement.plist
+
+## Xcode - other
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+## DocC build output
+*.doccarchive
+
+## macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+## CocoaPods / Carthage / Fastlane (in case they appear later)
+Pods/
+Carthage/Build/
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output

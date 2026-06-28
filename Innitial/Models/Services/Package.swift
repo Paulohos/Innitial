@@ -5,6 +5,10 @@ import PackageDescription
 
 let package = Package(
     name: "Services",
+    platforms: [
+        .iOS(.v16),
+        .macOS(.v13),
+    ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
@@ -18,6 +22,7 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../AppConfiguration"),
+        .package(path: "../Database"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -26,6 +31,7 @@ let package = Package(
             name: "NetworkLayer",
             dependencies: [
                 .product(name: "AppConfiguration", package: "AppConfiguration"),
+                .product(name: "LocalStoreService", package: "Database"),
             ],
         ),
         .target(

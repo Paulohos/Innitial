@@ -60,6 +60,38 @@ public struct LocalStoreService: Sendable {
     }
 }
 
+// MARK: - Required reads (throw instead of returning nil)
+
+/// Error thrown when a value that *must* exist is missing.
+public enum LocalStoreError: Error, Sendable, Equatable {
+    case valueNotFound(key: String)
+}
+
+extension LocalStoreService {
+    /// Like ``load(_:)`` but returns a **non-optional** value, throwing
+    /// ``LocalStoreError/valueNotFound(key:)`` when nothing is stored.
+    /// Use for keys that must exist in context (e.g. the auth token on an
+    /// authenticated request).
+    public func require<Value>(_ keyPath: KeyPath<StorageKeys, StorageKey<Value>>) throws -> Value {
+        guard let value = try load(keyPath) else {
+            throw LocalStoreError.valueNotFound(key: StorageKeys()[keyPath: keyPath].name)
+        }
+        return value
+    }
+
+    /// Like ``load(_:)`` but throws **your** error when nothing is stored, returning a
+    /// non-optional value. Lets the caller map a missing value to a domain-specific error.
+    ///
+    ///     let token = try store.load(\.authToken, orThrow: NetworkServiceError.noAuthTokenInStorage)
+    public func load<Value>(
+        _ keyPath: KeyPath<StorageKeys, StorageKey<Value>>,
+        orThrow error: @autoclosure () -> Error
+    ) throws -> Value {
+        guard let value = try load(keyPath) else { throw error() }
+        return value
+    }
+}
+
 // MARK: - Bulk removal
 
 extension LocalStoreService {

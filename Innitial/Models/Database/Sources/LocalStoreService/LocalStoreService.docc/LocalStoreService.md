@@ -102,9 +102,18 @@ Pronto. Isso é 90% do uso no dia a dia.
 
 ## Guia detalhado
 
-### Lendo valores com segurança
+### Lendo valores: três sabores
 
-`load(_:)` devolve um **opcional** e pode lançar erro. O jeito mais comum:
+Existem três formas de ler, dependendo do que "não existe" significa **naquele contexto**:
+
+| Método | Devolve | Quando faltar |
+|---|---|---|
+| ``LocalStoreService/load(_:)`` | `Value?` | retorna `nil` (ausência é normal) |
+| ``LocalStoreService/require(_:)`` | `Value` | lança ``LocalStoreError/valueNotFound(key:)`` |
+| ``LocalStoreService/load(_:orThrow:)`` | `Value` | lança **o erro que você passar** |
+
+**1) `load` — ausência é normal.** É o caso de conveniências (último e-mail, flag de
+onboarding): não ter ainda é esperado, não é erro.
 
 ```swift
 guard let email = try? store.load(\.lastUsedLoginEmail) else {
@@ -117,6 +126,29 @@ guard let email = try? store.load(\.lastUsedLoginEmail) else {
 Por que `email` sai como `String` e não `String??`? Porque o `try?` do Swift
 **achata** o opcional: `load` já devolve `String?`, e o `try?` não empilha outro
 nível. Então `guard let` te dá o `String` direto.
+
+**2) `require` — tem que existir.** Para chaves que, naquele contexto, são
+obrigatórias (ex.: o token numa request autenticada). Você recebe um valor
+**não-opcional**; se faltar, ele **lança**:
+
+```swift
+do {
+    let token = try store.require(\.authToken)   // String (não-opcional)
+    // ...
+} catch {
+    // caiu aqui = token não estava salvo (LocalStoreError.valueNotFound)
+}
+```
+
+**3) `load(_:orThrow:)` — você escolhe o erro.** Igual ao `require`, mas em vez do
+erro genérico do módulo, lança um erro **seu** (do seu domínio):
+
+```swift
+let token = try store.load(\.authToken, orThrow: NetworkServiceError.noAuthTokenInStorage)
+```
+
+> Regra de bolso: **ausência é normal → `load`**. **Ausência é erro → `require`**
+> (ou `load(_:orThrow:)` quando você quer mapear pro seu próprio tipo de erro).
 
 ### Tipos suportados
 
@@ -277,6 +309,9 @@ do {
 UserDefaults não lança; o FileSystem lança erros de I/O do Foundation. Na maioria
 dos casos um `try?` resolve, mas o `throws` está aí quando você quiser tratar.
 
+Além disso, ``require(_:)`` lança ``LocalStoreError/valueNotFound(key:)`` quando uma
+chave obrigatória está vazia (veja "Lendo valores: três sabores").
+
 ## Perguntas frequentes (e pegadinhas)
 
 **"Posso usar a mesma chave em backends diferentes?"**
@@ -313,3 +348,4 @@ Em `StorageKeys+Keys.swift`, dentro de `extension StorageKeys`. Uma linha por ch
 
 ### Erros
 - ``KeychainError``
+- ``LocalStoreError``

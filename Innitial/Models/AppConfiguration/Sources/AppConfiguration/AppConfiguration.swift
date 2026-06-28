@@ -6,6 +6,12 @@ public struct EnvironmentConfigurationService: Sendable{
     public let termsOfUse: @Sendable () -> String
     public let privacyPolicy: @Sendable () -> String
     public let appStoreURL: @Sendable () -> String
+    /// App version (CFBundleShortVersionString), e.g. "1.0".
+    public let releaseVersionNumber: @Sendable () -> String
+    /// OS version, e.g. "17.0".
+    public let systemVersion: @Sendable () -> String
+    /// Current time zone identifier, e.g. "America/Sao_Paulo".
+    public let timeZoneIdentifier: @Sendable () -> String
 }
 
 extension EnvironmentConfigurationService {
@@ -19,13 +25,21 @@ extension EnvironmentConfigurationService {
         let termsOfUse = value("termsOfUseURL")
         let privacyPolicy = value("privacyPolicyUrl")
         let appStoreURL = value("appStoreURL")
+        let releaseVersionNumber = bundle.releaseVersionNumber ?? ""
 
         return .init(
             baseUrl: { baseUrl },
             bundleID: { bundleID },
             termsOfUse: { termsOfUse },
             privacyPolicy: { privacyPolicy },
-            appStoreURL: { appStoreURL }
+            appStoreURL: { appStoreURL },
+            releaseVersionNumber: { releaseVersionNumber },
+            systemVersion: {
+                let v = ProcessInfo.processInfo.operatingSystemVersion
+                return "\(v.majorVersion).\(v.minorVersion).\(v.patchVersion)"
+            },
+            // computed live so it reflects the device's current time zone
+            timeZoneIdentifier: { TimeZone.current.identifier }
         )
    }
 
@@ -35,14 +49,27 @@ extension EnvironmentConfigurationService {
        bundleID: String? = nil,
        termsOfUse: String? = nil,
        privacyPolicy: String? = nil,
-       appStoreURL: String? = nil
+       appStoreURL: String? = nil,
+       releaseVersionNumber: String? = nil,
+       systemVersion: String? = nil,
+       timeZoneIdentifier: String? = nil
     ) -> Self {
         .init(
            baseUrl: { baseUrl ?? "" },
            bundleID: { bundleID ?? "" },
            termsOfUse: { termsOfUse ?? "" },
            privacyPolicy: { privacyPolicy ?? "" },
-           appStoreURL: { appStoreURL ?? "" }
+           appStoreURL: { appStoreURL ?? "" },
+           releaseVersionNumber: { releaseVersionNumber ?? "" },
+           systemVersion: { systemVersion ?? "" },
+           timeZoneIdentifier: { timeZoneIdentifier ?? "" }
         )
+    }
+}
+
+extension Bundle {
+    /// The app's release version (CFBundleShortVersionString), e.g. "1.0".
+    var releaseVersionNumber: String? {
+        infoDictionary?["CFBundleShortVersionString"] as? String
     }
 }
