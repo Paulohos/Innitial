@@ -6,6 +6,12 @@
 	<dict>
 		<key>baseURL</key>
 		<string>https://api.themoviedb.org</string>
+		<key>bannerUrl</key>
+		<string>https://image.tmdb.org/t/p</string>
+		<key>apiKey</key>
+		<string>af69256484dc3af8ffdf2c23f25b8ad6</string>
+		<key>accessToken</key>
+		<string>eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhZjY5MjU2NDg0ZGMzYWY4ZmZkZjJjMjNmMjViOGFkNiIsIm5iZiI6MTcyMzE0NzE4MC42MDYwMDAyLCJzdWIiOiI2NmI1MjNhYzQyZDRhOTUzNGRkNjMyZjQiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.ZvJWbnQ7E7zetvu-Ags7VwgNO2j0wEYZ6BKZDyF3wDE</string>
 	</dict>
 </dict>
 </plist>

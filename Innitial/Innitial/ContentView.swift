@@ -7,21 +7,23 @@
 
 import SwiftUI
 import AppDependencies
-import LocalStoreService
-import Login
+import Home
+import MovieListService
 
 struct ContentView: View {
-    // O ViewModel é dono da tela; o app injeta o store (database) nele.
-    @State private var loginViewModel: LoginViewModel
+    // O ContentView é o composition root: monta o ViewModel da tela inicial
+    // injetando só o serviço de que o Home precisa.
+    private let homeViewModel: HomeViewModel
 
     init(dependencies: AppDependencies) {
-        _loginViewModel = State(
-            initialValue: LoginViewModel(store: dependencies.localStore)
+        homeViewModel = HomeViewModel(
+            movieListService: dependencies.movieListService,
+            imageBaseURL: dependencies.imageBaseURL
         )
     }
 
     var body: some View {
-        LoginView(viewModel: loginViewModel)
+        HomeView(viewModel: homeViewModel)
     }
 }
 

@@ -7,8 +7,10 @@ public enum HTTPMethod: String {
 
 // swiftlint:disable identifier_name
 enum APIVersion: String {
-    case v0 = ""
-    case v1
+    case v1 = "1"
+    case v2 = "2"
+    case v3 = "3"
+    case v4 = "4"
 }
 
 enum APIOrigin {
@@ -25,14 +27,14 @@ struct EndpointDescriptor {
     let method: HTTPMethod
 
     static func localizedAPI(
-        version: APIVersion = .v0,
+        version: APIVersion = .v3,
         method: HTTPMethod = .get
     ) -> Self {
         .init(origin: .localizedAPI, version: version, method: method)
     }
 
     static func customAPI(_ baseURL: String, method: HTTPMethod = .get) -> Self {
-        .init(origin: .custom(baseURL), version: .v0, method: method)
+        .init(origin: .custom(baseURL), version: .v3, method: method)
     }
 }
 
@@ -42,6 +44,8 @@ extension Endpoint {
         case .listOfMovies:
             return .localizedAPI()
         case .movieDetails:
+            return .localizedAPI()
+        case .popularMovies:
             return .localizedAPI()
         }
     }

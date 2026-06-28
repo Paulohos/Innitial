@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		FA2F5E7E2FF0709000BB0A7E /* AppDependencies in Frameworks */ = {isa = PBXBuildFile; productRef = FA2F5E7D2FF0709000BB0A7E /* AppDependencies */; };
-		FA2F5E842FF0711800BB0A7E /* Login in Frameworks */ = {isa = PBXBuildFile; productRef = FA2F5E832FF0711800BB0A7E /* Login */; };
 		FA310E492FF16B6D0086E840 /* AllTests.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = FA310E482FF16B6D0086E840 /* AllTests.xctestplan */; };
+		FA929D402FF188C300D6F5E8 /* Home in Frameworks */ = {isa = PBXBuildFile; productRef = FA929D3F2FF188C300D6F5E8 /* Home */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,8 +80,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FA2F5E842FF0711800BB0A7E /* Login in Frameworks */,
 				FA2F5E7E2FF0709000BB0A7E /* AppDependencies in Frameworks */,
+				FA929D402FF188C300D6F5E8 /* Home in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -168,7 +168,7 @@
 			name = Innitial;
 			packageProductDependencies = (
 				FA2F5E7D2FF0709000BB0A7E /* AppDependencies */,
-				FA2F5E832FF0711800BB0A7E /* Login */,
+				FA929D3F2FF188C300D6F5E8 /* Home */,
 			);
 			productName = Innitial;
 			productReference = FABEB5F72FF04F2F0065F069 /* Innitial.app */;
@@ -638,9 +638,9 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = AppDependencies;
 		};
-		FA2F5E832FF0711800BB0A7E /* Login */ = {
+		FA929D3F2FF188C300D6F5E8 /* Home */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = Login;
+			productName = Home;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

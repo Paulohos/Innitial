@@ -19,6 +19,10 @@ let package = Package(
             name: "NetworkLayer",
             targets: ["NetworkLayer"]
         ),
+        .library(
+            name: "MovieListService",
+            targets: ["MovieListService"]
+        ),
     ],
     dependencies: [
         .package(path: "../AppConfiguration"),
@@ -32,6 +36,12 @@ let package = Package(
             dependencies: [
                 .product(name: "AppConfiguration", package: "AppConfiguration"),
                 .product(name: "LocalStoreService", package: "Database"),
+            ],
+        ),
+        .target(
+            name: "MovieListService",
+            dependencies: [
+                "NetworkLayer"
             ],
         ),
         .target(

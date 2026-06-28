@@ -44,6 +44,7 @@ struct NetworkServiceTests {
     private func makeSUT(
         configuration: EnvironmentConfigurationService = .mock(
             baseUrl: "https://api.test",
+            accessToken: "abc123",
             releaseVersionNumber: "1.0",
             systemVersion: "17.0",
             timeZoneIdentifier: "America/Sao_Paulo"
@@ -110,8 +111,10 @@ struct NetworkServiceTests {
 
     @Test
     func `a missing auth token fails the request with the default error`() async throws {
-        let store = LocalStoreService.inMemory() // no token saved
-        let (sut, _) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
+        // No access token configured → getHeaders masks it into the default error.
+        let configuration = EnvironmentConfigurationService.mock(baseUrl: "https://api.test")
+        let store = LocalStoreService.inMemory()
+        let (sut, _) = makeSUT(configuration: configuration, store: store) { .mock(data: emptyMock, status: 200) }
 
         do {
             let _: NoReply = try await sut.call(endpoint: .listOfMovies)
