@@ -12,7 +12,7 @@ struct AppDependenciesTests {
 
     @Test
     func `live builds a container with a real system version`() {
-        // .live() reads Bundle.main (no EnviromentSetting in the test bundle, so the
+        // .live() reads Bundle.main (no EnvironmentSetting in the test bundle, so the
         // plist-backed fields are empty), but it must construct without crashing and
         // expose a real OS version computed at access time.
         let dependencies = AppDependencies.live()

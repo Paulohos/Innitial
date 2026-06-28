@@ -17,7 +17,7 @@ public struct EnvironmentConfigurationService: Sendable {
 extension EnvironmentConfigurationService {
 
     public static func live(bundle: Bundle = .main) -> Self {
-        let settings = bundle.infoDictionary?["EnviromentSetting"] as? [String: Any] ?? [:]
+        let settings = bundle.infoDictionary?["EnvironmentSetting"] as? [String: Any] ?? [:]
         return .live(settings: settings, releaseVersionNumber: bundle.releaseVersionNumber ?? "")
     }
 
