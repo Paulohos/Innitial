@@ -34,7 +34,7 @@ private extension NetworkService {
                 /// Specifically, we must ensure the generation of the appropriate error object or directly return the `data`.
                 /// This project adheres to a standard error structure for errors falling within the range of 400 to 499,
                 /// such as {code: 123, title: "Oops... something went wrong", message: "Email or password invalid"}.
-                var defaultError = try JSONDecoder().decode(DefaultError.self, from: data)
+                var defaultError = try sharedJSONDecoder.decode(DefaultError.self, from: data)
                 // Preserve the server's business error code (e.g. 123 = "invalid password").
                 // Only fall back to the HTTP status when the body didn't carry one.
                 if defaultError.code == .zero {
@@ -86,7 +86,7 @@ extension NetworkService {
             )
 
             do {
-                return try JSONDecoder().decode(Return.self, from: data)
+                return try sharedJSONDecoder.decode(Return.self, from: data)
             } catch {
                 throw handleErrorReturns(
                     shouldReturnDefaultError,

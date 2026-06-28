@@ -5,56 +5,43 @@ import Foundation
 public typealias NetworkResponse = Result<(Data, HTTPURLResponse), Error>
 
 extension NetworkService {
-    /// Mock constructor for `NetworkService`
+    /// Mock constructor for `NetworkService`.
     ///
-    /// Usage:
-    /// ```
-    /// class Mock: XCTestCase {
-    ///     var networkServiceResponse: NetworkResponse!
-    ///     var networkService = NetworkService.mock(
-    ///         appConfiguration: appConfiguration,
-    ///         localStore: localStore,
-    ///         mockValueProvider: { self.networkServiceResponse }
+    /// `mockValueProvider` is called for every request and decides what the service
+    /// responds with. The handful of `NetworkResponse.mock(...)` helpers build the
+    /// `(Data, HTTPURLResponse)` pair for you.
+    ///
+    /// Single canned response (Swift Testing):
+    /// ```swift
+    /// @Test func decodesBody() async throws {
+    ///     let sut = NetworkService.mock(
+    ///         appConfiguration: .mock(),
+    ///         localStore: .inMemory(),
+    ///         mockValueProvider: { .mock(data: dummyMock, status: 200) }
     ///     )
-    ///
-    ///     func testThing() {
-    ///         // this sets the mock value that the service will respond with
-    ///         let path = Bundle.module.path(forResource: "configs", ofType: "json")
-    ///         // try using autocomplete on `networkServiceResponse` values to see the other useful mock constructors
-    ///         // this one takes the bundle filepath for a JSON resource, and does all the decoding and stuff for us.
-    ///         networkServiceResponse = try .mockFromFile(dataPath: path, status: 200)
-    ///
-    ///            let expectation = expectation(description: "Correct response")
-    ///            networkDependentService.doAPICall { response in
-    ///                switch response {
-    ///                case .success(let returnValue):
-    ///                    XCTAssertEqual(returnValue, expectedValue)
-    ///                case .error(let error):
-    ///                    XCTFail()
-    ///                }
-    ///                expectation.fulfill()
-    ///            }
-    ///
-    ///            waitForExpectations(timeout: 1.0)
-    ///     }
+    ///     let result: Dummy = try await sut.call(endpoint: .listOfMovies)
+    ///     #expect(result == Dummy(dummy: "dummy"))
     /// }
-    ///
-    /// // Here's another way you could use this flexible interface, for handling the results of many calls in a row.
-    /// // It will pull items from the queue one by one (you could extend the impl to `XCTFail()` if it attempts to
-    /// // pull too many items from the queue)
-    /// var mockValueQueue: [NetworkResponse] = [...]
-    /// var networkService = NetworkService.mock(
-    ///     appConfiguration: appConfiguration,
-    ///     localStore: localStore,
-    ///        mockValueProvider: { mockValueQueue.removeFirst() }
-    ///    )
     /// ```
+    ///
+    /// A queue of responses, one popped per call (handy for multi-request flows):
+    /// ```swift
+    /// let queue = ResponseQueue([.mock(status: 401), .mock(data: dummyMock, status: 200)])
+    /// let sut = NetworkService.mock(
+    ///     appConfiguration: .mock(),
+    ///     localStore: .inMemory(),
+    ///     mockValueProvider: { queue.next() }
+    /// )
+    /// ```
+    ///
+    /// To also assert on the `URLRequest` that was sent, use `testMock`, whose provider
+    /// receives the request before returning a response.
     ///
     /// - Parameters:
     ///   - appConfiguration: AppConfiguration dependency
     ///   - localStore: LocalStoreService dependency
-    ///   - notifiersService: NotifiersService dependency
-    ///   - mockValueProvider: A mechanism through which mock values can be passed to the network service.
+    ///   - mockValueProvider: Supplies the response the service returns for each request.
+    ///     Defaults to an empty `200`.
     /// - Returns: A NetworkService mock object
     public static func mock(
         appConfiguration: EnvironmentConfigurationService,

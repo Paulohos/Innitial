@@ -18,10 +18,9 @@ extension Endpoint {
 
     var queryItems: [APIQueryItem] {
         switch self {
-        case .listOfMovies:
+        // `movieDetails` carries its id in the path (`/movies/{id}`), so no query item is needed.
+        case .listOfMovies, .movieDetails:
             return []
-        case .movieDetails(let id):
-            return [.keyValue(key: "id", value: String(id))]
         }
     }
 

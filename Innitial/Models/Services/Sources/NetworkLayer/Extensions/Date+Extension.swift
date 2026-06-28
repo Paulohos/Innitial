@@ -1,23 +1,23 @@
 import Foundation
 
 extension Date {
-    enum LocaleType: String {
-        /// "pt_BR"
-        case ptBr = "pt_BR"
-    }
-    /// This method is used to send the a date in the correct format to the sever
-    /// The server will always receive the date in the UTC 0(zero)
-    func convertToUTC() -> String {
+    /// Formatter for the wire date format, e.g. "2023-07-21T17:19:29.744Z".
+    ///
+    /// Built once and reused — `DateFormatter` is expensive to allocate. We use the
+    /// `en_US_POSIX` locale, which is the correct choice for fixed-format strings:
+    /// it ignores the device's 12h/24h and calendar settings, so the output is stable
+    /// regardless of region. The time zone is pinned to UTC because the server always
+    /// sends and receives dates at UTC 0.
+    private static let utcFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z"
-        // Forcing the clock conversion to 24 hour Time
-        // We need to do that because some places like USA uses a system clock of 12 hour Time
-        // And because of that we're facing some problems to convert the dates
-        // Because de server always receive and send a 24 hour Time date i.e. "2023-07-21T17:19:29.744Z".
-        formatter.locale = Locale(identifier: LocaleType.ptBr.rawValue)
-        // Forcing data to UTC 0(zero)
-        // Server always receive the dates on the UTC 0
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = TimeZone(identifier: "UTC")
-        return formatter.string(from: self)
+        return formatter
+    }()
+
+    /// Renders the date in the wire format the server expects, in UTC 0.
+    func convertToUTC() -> String {
+        Date.utcFormatter.string(from: self)
     }
 }

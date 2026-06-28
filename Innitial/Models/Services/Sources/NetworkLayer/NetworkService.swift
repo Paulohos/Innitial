@@ -7,6 +7,10 @@ import os
 /// is categorized, filterable in Console.app, and silenced in release builds.
 let logger = Logger(subsystem: "com.innitial.network", category: "NetworkService")
 
+/// Shared JSON coders, reused across requests to avoid re-allocating them on every call.
+let sharedJSONEncoder = JSONEncoder()
+let sharedJSONDecoder = JSONDecoder()
+
 public struct NetworkService: Sendable {
 
     /// Lets us access properties that we need to send to the server with every request

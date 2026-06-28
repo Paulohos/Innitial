@@ -94,27 +94,25 @@ extension NetworkService {
             }
         }
 
-        if !additionalSettings.isEmpty {
-            additionalSettings.forEach {
-                switch $0 {
-                case .appendHeader(let headerArray):
-                    headerArray.forEach {
-                        for (key, value) in $0 {
-                            headers[key] = value
-                        }
+        additionalSettings.forEach {
+            switch $0 {
+            case .appendHeader(let headerArray):
+                headerArray.forEach {
+                    for (key, value) in $0 {
+                        headers[key] = value
                     }
-
-                case .overrideHeader(let headerArray):
-                    headers = [:]
-                    headerArray.forEach {
-                        for (key, value) in $0 {
-                            headers[key] = value
-                        }
-                    }
-
-                default:
-                    break
                 }
+
+            case .overrideHeader(let headerArray):
+                headers = [:]
+                headerArray.forEach {
+                    for (key, value) in $0 {
+                        headers[key] = value
+                    }
+                }
+
+            default:
+                break
             }
         }
 
@@ -122,11 +120,9 @@ extension NetworkService {
     }
 
     private func getCustomTimeoutInterval(_ additionalSettings: [AdditionalSettings]) -> Double? {
-        if !additionalSettings.isEmpty {
-            for setting in additionalSettings {
-                if case .setTimeOut(let int) = setting {
-                    return int
-                }
+        for setting in additionalSettings {
+            if case .setTimeOut(let timeout) = setting {
+                return timeout
             }
         }
 
@@ -136,7 +132,7 @@ extension NetworkService {
     func unhandledStatusError(_ status: Int, data: Data) -> Error {
         switch status {
         case 401: return NetworkServiceError.authenticationFailure
-        case let status: return NetworkServiceError.unhandledHTTPStatus(status, data)
+        default: return NetworkServiceError.unhandledHTTPStatus(status, data)
         }
     }
 
@@ -165,7 +161,7 @@ extension NetworkService {
 
         var request = URLRequest(url: baseURL)
         request.httpMethod = endpoint.descriptor.method.rawValue
-        headers.forEach { request.addValue($0.value, forHTTPHeaderField: $0.key) }
+        headers.forEach { request.setValue($0.value, forHTTPHeaderField: $0.key) }
 
         if let timeout = getCustomTimeoutInterval(additionalSettings) {
             request.timeoutInterval = timeout

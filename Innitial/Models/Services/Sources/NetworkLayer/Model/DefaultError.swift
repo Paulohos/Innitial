@@ -1,4 +1,4 @@
-public struct DefaultError: Decodable, Error, Equatable {
+public struct DefaultError: Decodable, Error, Equatable, Sendable {
     public var code: Int
     public var title: String
     public var message: String

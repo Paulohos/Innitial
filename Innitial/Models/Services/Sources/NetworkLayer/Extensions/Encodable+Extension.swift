@@ -8,7 +8,7 @@ extension Encodable {
     /// than being sent as a request with no body.
     func asData() throws -> Data {
         do {
-            return try JSONEncoder().encode(self)
+            return try sharedJSONEncoder.encode(self)
         } catch {
             throw NetworkServiceError.bodyEncodingFailure(error)
         }
