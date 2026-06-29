@@ -28,7 +28,7 @@ public struct HomeView: View {
         }
         .foregroundStyle(.white)
         .appBackground()
-        .task { await viewModel.loadPopularMovies() }
+        .task { await viewModel.load() }
     }
 
     @ViewBuilder
@@ -44,10 +44,17 @@ public struct HomeView: View {
                 .frame(maxWidth: .infinity)
                 .padding()
         } else {
-            CarouselSection(title: "Mais populares", onSeeAll: { /* TODO: navegar para a lista completa */ }) {
-                ForEach(viewModel.movies) { movie in
-                    PosterCard(imageURL: viewModel.posterURL(for: movie))
-                }
+            carousel(title: "Mais populares", movies: viewModel.popular)
+            carousel(title: "Mais bem avaliados", movies: viewModel.topRated)
+            carousel(title: "Em cartaz", movies: viewModel.nowPlaying)
+            carousel(title: "Em breve", movies: viewModel.upcoming)
+        }
+    }
+
+    private func carousel(title: String, movies: [Movie]) -> some View {
+        CarouselSection(title: title, onSeeAll: { /* TODO: navegar para a lista completa */ }) {
+            ForEach(movies) { movie in
+                PosterCard(imageURL: viewModel.posterURL(for: movie))
             }
         }
     }
@@ -55,7 +62,12 @@ public struct HomeView: View {
 
 #Preview {
     HomeView(viewModel: HomeViewModel(
-        movieListService: .mock(popularMovies: .sample),
+        movieListService: .mock(
+            popularMovies: .sample,
+            topRatedMovies: .sample,
+            upcomingMovies: .sample,
+            nowPlayingMovies: .sample
+        ),
         imageBaseURL: "https://image.tmdb.org/t/p"
     ))
 }

@@ -5,13 +5,22 @@ import SwiftUI
 public struct PosterCard: View {
     private let imageURL: URL?
     private let width: CGFloat
+    private let action: () -> Void
 
-    public init(imageURL: URL?, width: CGFloat = 140) {
+    public init(imageURL: URL?, width: CGFloat = 140, action: @escaping () -> Void = {}) {
         self.imageURL = imageURL
         self.width = width
+        self.action = action
     }
 
     public var body: some View {
+        Button(action: action) {
+            poster
+        }
+        .buttonStyle(.scale)
+    }
+
+    private var poster: some View {
         AsyncImage(url: imageURL) { phase in
             switch phase {
             case .success(let image):

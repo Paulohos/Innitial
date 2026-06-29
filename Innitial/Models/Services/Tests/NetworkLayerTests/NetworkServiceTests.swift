@@ -81,7 +81,7 @@ struct NetworkServiceTests {
         let store = try storeWithToken("abc123")
         let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
 
-        let _: NoReply = try await sut.call(endpoint: .listOfMovies)
+        let _: NoReply = try await sut.call(endpoint: .popularMovies(page: 1))
 
         let headers = try #require(spy.request?.allHTTPHeaderFields)
         #expect(headers["Content-Type"] == "application/json")
@@ -101,7 +101,7 @@ struct NetworkServiceTests {
         let store = try storeWithToken()
         let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
 
-        let _: NoReply = try await sut.call(endpoint: .listOfMovies)
+        let _: NoReply = try await sut.call(endpoint: .popularMovies(page: 1))
 
         let requestedAt = try #require(spy.request?.allHTTPHeaderFields?["requestedAt"])
         // e.g. "2023-07-21T17:19:29.744Z"
@@ -117,7 +117,7 @@ struct NetworkServiceTests {
         let (sut, _) = makeSUT(configuration: configuration, store: store) { .mock(data: emptyMock, status: 200) }
 
         do {
-            let _: NoReply = try await sut.call(endpoint: .listOfMovies)
+            let _: NoReply = try await sut.call(endpoint: .popularMovies(page: 1))
             Issue.record("Expected the call to throw")
         } catch let NetworkServiceError.defaultError(error) {
             // A missing token is masked into the generic default error by getHeaders.
@@ -134,7 +134,7 @@ struct NetworkServiceTests {
         let store = try storeWithToken()
         let (sut, _) = makeSUT(store: store) { .mock(data: dummyMock, status: 200) }
 
-        let result: Dummy = try await sut.call(endpoint: .listOfMovies)
+        let result: Dummy = try await sut.call(endpoint: .popularMovies(page: 1))
 
         #expect(result == Dummy(dummy: "dummy"))
     }
@@ -147,7 +147,7 @@ struct NetworkServiceTests {
         let (sut, _) = makeSUT(store: store) { .mock(data: defaultErrorMock, status: 400) }
 
         do {
-            let _: NoReply = try await sut.call(endpoint: .listOfMovies)
+            let _: NoReply = try await sut.call(endpoint: .popularMovies(page: 1))
             Issue.record("Expected the call to throw")
         } catch let NetworkServiceError.defaultError(error) {
             #expect(error.code == 123) // server's business code is preserved, not the HTTP status
@@ -164,7 +164,7 @@ struct NetworkServiceTests {
         let (sut, _) = makeSUT(store: store) { .mock(data: emptyMock, status: 400) }
 
         do {
-            let _: NoReply = try await sut.call(endpoint: .listOfMovies)
+            let _: NoReply = try await sut.call(endpoint: .popularMovies(page: 1))
             Issue.record("Expected the call to throw")
         } catch let NetworkServiceError.defaultError(error) {
             #expect(error.code == 400)
@@ -180,7 +180,7 @@ struct NetworkServiceTests {
         let (sut, _) = makeSUT(store: store) { .mock(data: dummyMock, status: 400) }
 
         do {
-            let _: NoReply = try await sut.call(endpoint: .listOfMovies, shouldReturnDefaultError: false)
+            let _: NoReply = try await sut.call(endpoint: .popularMovies(page: 1), shouldReturnDefaultError: false)
             Issue.record("Expected the call to throw")
         } catch let NetworkServiceError.unhandledHTTPStatus(status, data) {
             #expect(status == 400)
@@ -196,7 +196,7 @@ struct NetworkServiceTests {
         let (sut, _) = makeSUT(store: store) { .mock(data: defaultErrorMock, status: 500) }
 
         do {
-            let _: NoReply = try await sut.call(endpoint: .listOfMovies)
+            let _: NoReply = try await sut.call(endpoint: .popularMovies(page: 1))
             Issue.record("Expected the call to throw")
         } catch let NetworkServiceError.defaultError(error) {
             #expect(error.code == 500)
@@ -212,7 +212,7 @@ struct NetworkServiceTests {
         let (sut, _) = makeSUT(store: store) { .mock(data: defaultErrorMock, status: 500) }
 
         do {
-            let _: NoReply = try await sut.call(endpoint: .listOfMovies, shouldReturnDefaultError: false)
+            let _: NoReply = try await sut.call(endpoint: .popularMovies(page: 1), shouldReturnDefaultError: false)
             Issue.record("Expected the call to throw")
         } catch let NetworkServiceError.serverError(status) {
             #expect(status == 500)
@@ -228,7 +228,7 @@ struct NetworkServiceTests {
         let (sut, _) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
 
         do {
-            let _: Dummy = try await sut.call(endpoint: .listOfMovies, shouldReturnDefaultError: false)
+            let _: Dummy = try await sut.call(endpoint: .popularMovies(page: 1), shouldReturnDefaultError: false)
             Issue.record("Expected the call to throw")
         } catch NetworkServiceError.jsonParsingFailure {
             // ✅ expected
@@ -245,7 +245,7 @@ struct NetworkServiceTests {
         let (sut, _) = makeSUT(store: store) { .mock(status: 401) }
 
         do {
-            let _: NoReply = try await sut.call(endpoint: .listOfMovies)
+            let _: NoReply = try await sut.call(endpoint: .popularMovies(page: 1))
             Issue.record("Expected the call to throw")
         } catch NetworkServiceError.retryOn401 {
             // ✅ default retry closure reports failure
@@ -269,7 +269,7 @@ struct NetworkServiceTests {
             retryOn401: { completion in completion(.success(())) }
         ) { responses.next() }
 
-        let result: Dummy = try await sut.call(endpoint: .listOfMovies)
+        let result: Dummy = try await sut.call(endpoint: .popularMovies(page: 1))
 
         #expect(result == Dummy(dummy: "dummy"))
         #expect(responses.callCount == 2) // original attempt + replay
@@ -278,15 +278,51 @@ struct NetworkServiceTests {
     // MARK: - URL building
 
     @Test
-    func `listOfMovies hits the popular movies path`() async throws {
+    func `popularMovies hits the popular path with the page query`() async throws {
         let store = try storeWithToken()
         let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
 
-        let _: NoReply = try await sut.call(endpoint: .listOfMovies)
+        let _: NoReply = try await sut.call(endpoint: .popularMovies(page: 1))
 
         let url = try #require(spy.request?.url)
-        #expect(url.absoluteString.hasSuffix("/movie/popular"))
-        #expect(url.query == nil)
+        #expect(url.path.hasSuffix("/movie/popular"))
+        #expect(url.query?.contains("page=1") == true)
+    }
+
+    @Test
+    func `topRatedMovies hits the top rated path with the page query`() async throws {
+        let store = try storeWithToken()
+        let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
+
+        let _: NoReply = try await sut.call(endpoint: .topRatedMovies(page: 2))
+
+        let url = try #require(spy.request?.url)
+        #expect(url.path.hasSuffix("/movie/top_rated"))
+        #expect(url.query?.contains("page=2") == true)
+    }
+
+    @Test
+    func `upcomingMovies hits the upcoming path with the page query`() async throws {
+        let store = try storeWithToken()
+        let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
+
+        let _: NoReply = try await sut.call(endpoint: .upcomingMovies(page: 3))
+
+        let url = try #require(spy.request?.url)
+        #expect(url.path.hasSuffix("/movie/upcoming"))
+        #expect(url.query?.contains("page=3") == true)
+    }
+
+    @Test
+    func `nowPlayingMovies hits the now playing path with the page query`() async throws {
+        let store = try storeWithToken()
+        let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
+
+        let _: NoReply = try await sut.call(endpoint: .nowPlayingMovies(page: 1))
+
+        let url = try #require(spy.request?.url)
+        #expect(url.path.hasSuffix("/movie/now_playing"))
+        #expect(url.query?.contains("page=1") == true)
     }
 
     @Test
@@ -308,7 +344,7 @@ struct NetworkServiceTests {
         let store = try storeWithToken()
         let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
 
-        let _: NoReply = try await sut.call(endpoint: .listOfMovies, body: Dummy(dummy: "hello"))
+        let _: NoReply = try await sut.call(endpoint: .popularMovies(page: 1), body: Dummy(dummy: "hello"))
 
         let body = try #require(spy.request?.httpBody)
         let decoded = try JSONDecoder().decode(Dummy.self, from: body)
@@ -320,7 +356,7 @@ struct NetworkServiceTests {
         let store = try storeWithToken()
         let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
 
-        let _: NoReply = try await sut.call(endpoint: .listOfMovies)
+        let _: NoReply = try await sut.call(endpoint: .popularMovies(page: 1))
 
         #expect(spy.request?.httpBody == nil)
     }
@@ -332,7 +368,7 @@ struct NetworkServiceTests {
         let store = try storeWithToken()
         let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
 
-        try await sut.call(endpoint: .listOfMovies)
+        try await sut.call(endpoint: .popularMovies(page: 1))
 
         #expect(spy.request != nil)
     }
@@ -345,7 +381,7 @@ struct NetworkServiceTests {
         let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
 
         let _: NoReply = try await sut.call(
-            endpoint: .listOfMovies,
+            endpoint: .popularMovies(page: 1),
             additionalSettings: [.appendHeader([["test": "test1"], ["test2": "test3"]])]
         )
 
@@ -362,7 +398,7 @@ struct NetworkServiceTests {
         let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
 
         let _: NoReply = try await sut.call(
-            endpoint: .listOfMovies,
+            endpoint: .popularMovies(page: 1),
             additionalSettings: [.appendHeader([["Authorization": "Bearer overridden"]])]
         )
 
@@ -377,7 +413,7 @@ struct NetworkServiceTests {
         let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
 
         let _: NoReply = try await sut.call(
-            endpoint: .listOfMovies,
+            endpoint: .popularMovies(page: 1),
             additionalSettings: [.overrideHeader([["test": "test1"], ["test2": "test3"]])]
         )
 
@@ -395,7 +431,7 @@ struct NetworkServiceTests {
         let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
 
         let _: NoReply = try await sut.call(
-            endpoint: .listOfMovies,
+            endpoint: .popularMovies(page: 1),
             additionalSettings: [.setTimeOut(100)]
         )
 

@@ -41,11 +41,15 @@ struct EndpointDescriptor {
 extension Endpoint {
     var descriptor: EndpointDescriptor {
         switch self {
-        case .listOfMovies:
-            return .localizedAPI()
         case .movieDetails:
             return .localizedAPI()
         case .popularMovies:
+            return .localizedAPI()
+        case .topRatedMovies:
+            return .localizedAPI()
+        case .upcomingMovies:
+            return .localizedAPI()
+        case .nowPlayingMovies:
             return .localizedAPI()
         }
     }

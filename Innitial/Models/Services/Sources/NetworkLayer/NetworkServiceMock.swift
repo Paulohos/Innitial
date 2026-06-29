@@ -19,7 +19,7 @@ extension NetworkService {
     ///         localStore: .inMemory(),
     ///         mockValueProvider: { .mock(data: dummyMock, status: 200) }
     ///     )
-    ///     let result: Dummy = try await sut.call(endpoint: .listOfMovies)
+    ///     let result: Dummy = try await sut.call(endpoint: .popularMovies(page: 1))
     ///     #expect(result == Dummy(dummy: "dummy"))
     /// }
     /// ```

@@ -6,17 +6,25 @@ import MovieListService
 @MainActor
 @Suite struct HomeViewModelTests {
 
-    @Test func `load populates movies on success`() async {
+    @Test func `load populates every carousel on success`() async {
         let sut = HomeViewModel(
-            movieListService: .mock(popularMovies: .sample),
+            movieListService: .mock(
+                popularMovies: .sample,
+                topRatedMovies: .sample,
+                upcomingMovies: .sample,
+                nowPlayingMovies: .sample
+            ),
             imageBaseURL: "https://image.tmdb.org/t/p"
         )
-        #expect(sut.movies.isEmpty)
+        #expect(sut.popular.isEmpty)
 
-        await sut.loadPopularMovies()
+        await sut.load()
 
-        #expect(sut.movies.count == Movie.samples.count)
-        #expect(sut.movies.first?.id == Movie.samples.first?.id)
+        #expect(sut.popular.count == Movie.samples.count)
+        #expect(sut.topRated.count == Movie.samples.count)
+        #expect(sut.upcoming.count == Movie.samples.count)
+        #expect(sut.nowPlaying.count == Movie.samples.count)
+        #expect(sut.popular.first?.id == Movie.samples.first?.id)
         #expect(sut.isLoading == false)
         #expect(sut.errorMessage == nil)
     }
@@ -24,9 +32,12 @@ import MovieListService
     @Test func `load sets an error message on failure`() async {
         let sut = HomeViewModel(movieListService: .failing(), imageBaseURL: "")
 
-        await sut.loadPopularMovies()
+        await sut.load()
 
-        #expect(sut.movies.isEmpty)
+        #expect(sut.popular.isEmpty)
+        #expect(sut.topRated.isEmpty)
+        #expect(sut.upcoming.isEmpty)
+        #expect(sut.nowPlaying.isEmpty)
         #expect(sut.errorMessage != nil)
         #expect(sut.isLoading == false)
     }
