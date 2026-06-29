@@ -17,9 +17,11 @@ let package = Package(
         ),
     ],
     dependencies: [
+        .package(path: "../AppConfiguration"),
         .package(path: "../Database"),
         .package(path: "../DesignSystem"),
         .package(path: "../Services"),
+        .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -27,17 +29,22 @@ let package = Package(
         .target(
             name: "Home",
             dependencies: [
+                .product(name: "AppConfiguration", package: "AppConfiguration"),
                 .product(name: "LocalStoreService", package: "Database"),
                 .product(name: "DesignSystem", package: "DesignSystem"),
                 .product(name: "MovieListService", package: "Services"),
-                .product(name: "Movies", package: "Services"),
+                .product(name: "MoviesService", package: "Services"),
+                .product(name: "Dependencies", package: "swift-dependencies"),
             ]
         ),
         .testTarget(
             name: "FeaturesTests",
             dependencies: [
                 "Home",
+                .product(name: "AppConfiguration", package: "AppConfiguration"),
                 .product(name: "MovieListService", package: "Services"),
+                .product(name: "MoviesService", package: "Services"),
+                .product(name: "Dependencies", package: "swift-dependencies"),
             ]
         ),
     ],

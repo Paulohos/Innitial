@@ -3,7 +3,9 @@
 //  Features
 
 import Foundation
-import Movies
+import AppConfiguration
+import Dependencies
+import MoviesService
 import MovieListService
 
 @MainActor
@@ -19,13 +21,15 @@ final class MovieDetailViewModel {
     private(set) var recommendations: [Movie] = []
 
     private let movieID: Int
-    private let moviesService: MoviesService
-    private let imageBaseURL: String
 
-    init(movieID: Int, moviesService: MoviesService, imageBaseURL: String) {
+    @ObservationIgnored @Dependency(\.moviesService) private var moviesService
+    @ObservationIgnored @Dependency(\.configuration) private var configuration
+
+    /// TMDB artwork base URL, taken straight from the configuration.
+    private var imageBaseURL: String { configuration.bannerUrl() }
+
+    init(movieID: Int) {
         self.movieID = movieID
-        self.moviesService = moviesService
-        self.imageBaseURL = imageBaseURL
     }
 
     func load() async {
@@ -82,11 +86,12 @@ extension MovieDetailViewModel {
         recommendations: [Movie] = Movie.samples,
         imageBaseURL: String = "https://image.tmdb.org/t/p"
     ) -> MovieDetailViewModel {
-        let viewModel = MovieDetailViewModel(
-            movieID: detail.id,
-            moviesService: .mock(detail: detail),
-            imageBaseURL: imageBaseURL
-        )
+        let viewModel = withDependencies {
+            $0.moviesService = .mock(detail: detail)
+            $0.configuration = .mock(bannerUrl: imageBaseURL)
+        } operation: {
+            MovieDetailViewModel(movieID: detail.id)
+        }
         viewModel.detail = detail
         viewModel.cast = cast
         viewModel.recommendations = recommendations

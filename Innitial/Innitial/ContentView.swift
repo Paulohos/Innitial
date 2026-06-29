@@ -6,29 +6,19 @@
 //
 
 import SwiftUI
-import AppDependencies
 import Home
-import MovieListService
-import Movies
 
 struct ContentView: View {
-    // O ContentView é o composition root: monta o ViewModel da tela inicial
-    // injetando só o serviço de que o Home precisa.
-    private let homeViewModel: HomeViewModel
-
-    init(dependencies: AppDependencies) {
-        homeViewModel = HomeViewModel(
-            movieListService: dependencies.movieListService,
-            moviesService: dependencies.moviesService,
-            imageBaseURL: dependencies.imageBaseURL
-        )
-    }
+    // Fora de testes/previews o app roda no contexto "live" do swift-dependencies,
+    // então `HomeViewModel()` resolve o grafo real (config → network → services)
+    // sozinho — sem container nem bootstrap.
+    @State private var viewModel = HomeViewModel()
 
     var body: some View {
-        HomeView(viewModel: homeViewModel)
+        HomeView(viewModel: viewModel)
     }
 }
 
 #Preview {
-    ContentView(dependencies: .mock())
+    ContentView()
 }

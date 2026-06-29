@@ -3,11 +3,12 @@
 //  Features
 
 import Foundation
+import AppConfiguration
+import Dependencies
 import MovieListService
-import Movies
 
 /// Drives the paginated "Ver todos" screen for a single category. It is self-contained:
-/// it holds the service and the category and issues its own requests (no callback to Home).
+/// it resolves its own services via `@Dependency` and issues its own requests.
 /// Seeded with the first page already fetched on Home; loads further pages on demand
 /// (infinite scroll) until `totalPages` is reached.
 @MainActor
@@ -21,27 +22,21 @@ final class AllMoviesViewModel {
 
     private var page: Int
     private let totalPages: Int
-    private let imageBaseURL: String
-    private let movieListService: MovieListService
-    private let moviesService: MoviesService
+
+    @ObservationIgnored @Dependency(\.movieListService) private var movieListService
+    @ObservationIgnored @Dependency(\.configuration) private var configuration
+
+    /// TMDB artwork base URL, taken straight from the configuration.
+    private var imageBaseURL: String { configuration.bannerUrl() }
 
     /// How many items from the end should trigger the next-page fetch.
     private let prefetchDistance = 10
 
-    init(
-        category: MovieCategory,
-        firstPage: MovieListResponse?,
-        imageBaseURL: String,
-        movieListService: MovieListService,
-        moviesService: MoviesService
-    ) {
+    init(category: MovieCategory, firstPage: MovieListResponse?) {
         self.category = category
         self.movies = firstPage?.results ?? []
         self.page = firstPage?.page ?? 0
         self.totalPages = firstPage?.totalPages ?? 0
-        self.imageBaseURL = imageBaseURL
-        self.movieListService = movieListService
-        self.moviesService = moviesService
 
         // No seed means the category never loaded — surface an error instead of an empty screen.
         if firstPage == nil {
@@ -93,6 +88,6 @@ final class AllMoviesViewModel {
 
     /// Builds the detail view model for a tapped movie (presented as a modal).
     func makeMovieDetailViewModel(for movie: Movie) -> MovieDetailViewModel {
-        MovieDetailViewModel(movieID: movie.id, moviesService: moviesService, imageBaseURL: imageBaseURL)
+        MovieDetailViewModel(movieID: movie.id)
     }
 }

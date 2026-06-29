@@ -24,13 +24,14 @@ let package = Package(
             targets: ["MovieListService"]
         ),
         .library(
-            name: "Movies",
-            targets: ["Movies"]
+            name: "MoviesService",
+            targets: ["MoviesService"]
         ),
     ],
     dependencies: [
         .package(path: "../AppConfiguration"),
         .package(path: "../Database"),
+        .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -40,18 +41,21 @@ let package = Package(
             dependencies: [
                 .product(name: "AppConfiguration", package: "AppConfiguration"),
                 .product(name: "LocalStoreService", package: "Database"),
+                .product(name: "Dependencies", package: "swift-dependencies"),
             ],
         ),
         .target(
             name: "MovieListService",
             dependencies: [
-                "NetworkLayer"
+                "NetworkLayer",
+                .product(name: "Dependencies", package: "swift-dependencies"),
             ],
         ),
         .target(
-            name: "Movies",
+            name: "MoviesService",
             dependencies: [
-                "NetworkLayer"
+                "NetworkLayer",
+                .product(name: "Dependencies", package: "swift-dependencies"),
             ],
         ),
         .target(
@@ -62,8 +66,8 @@ let package = Package(
             dependencies: ["Services"]
         ),
         .testTarget(
-            name: "MoviesTests",
-            dependencies: ["Movies"]
+            name: "MoviesServiceTests",
+            dependencies: ["MoviesService"]
         ),
         .testTarget(
             name: "NetworkLayerTests",

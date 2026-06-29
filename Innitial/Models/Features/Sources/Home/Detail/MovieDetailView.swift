@@ -5,7 +5,7 @@
 
 import SwiftUI
 import DesignSystem
-import Movies
+import MoviesService
 import MovieListService
 
 /// Movie detail screen, presented as a modal. Built per the design: backdrop header,

@@ -3,8 +3,9 @@
 //  Features
 
 import Foundation
+import AppConfiguration
+import Dependencies
 import MovieListService
-import Movies
 
 @MainActor
 @Observable
@@ -16,15 +17,13 @@ public final class HomeViewModel {
     public private(set) var isLoading = false
     public private(set) var errorMessage: String?
 
-    private let movieListService: MovieListService
-    private let moviesService: MoviesService
-    private let imageBaseURL: String
+    @ObservationIgnored @Dependency(\.movieListService) private var movieListService
+    @ObservationIgnored @Dependency(\.configuration) private var configuration
 
-    public init(movieListService: MovieListService, moviesService: MoviesService, imageBaseURL: String) {
-        self.movieListService = movieListService
-        self.moviesService = moviesService
-        self.imageBaseURL = imageBaseURL
-    }
+    /// TMDB artwork base URL, taken straight from the configuration.
+    private var imageBaseURL: String { configuration.bannerUrl() }
+
+    public init() {}
 
     // MARK: - Per-category accessors (used by the carousels)
 
@@ -77,20 +76,15 @@ public final class HomeViewModel {
     // MARK: - Navigation
 
     /// Builds the paginated full-list view model for a category, seeded with the
-    /// already-loaded first page so it shows instantly.
+    /// already-loaded first page so it shows instantly. Services are resolved by the
+    /// child via `@Dependency` — nothing is threaded through here.
     func makeAllMoviesViewModel(for category: MovieCategory) -> AllMoviesViewModel {
-        AllMoviesViewModel(
-            category: category,
-            firstPage: pages[category],
-            imageBaseURL: imageBaseURL,
-            movieListService: movieListService,
-            moviesService: moviesService
-        )
+        AllMoviesViewModel(category: category, firstPage: pages[category])
     }
 
     /// Builds the detail view model for a tapped movie (presented as a modal).
     func makeMovieDetailViewModel(for movie: Movie) -> MovieDetailViewModel {
-        MovieDetailViewModel(movieID: movie.id, moviesService: moviesService, imageBaseURL: imageBaseURL)
+        MovieDetailViewModel(movieID: movie.id)
     }
 
     // MARK: - Images

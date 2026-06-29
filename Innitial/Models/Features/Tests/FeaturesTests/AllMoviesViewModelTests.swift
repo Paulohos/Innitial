@@ -1,7 +1,7 @@
 import Foundation
 import Testing
+import Dependencies
 import MovieListService
-import Movies
 @testable import Home
 
 // Free builders (no `self` capture) so they can be used inside `@Sendable` mock closures.
@@ -31,13 +31,11 @@ private func samplePage(_ page: Int, totalPages: Int, count: Int = 20) -> MovieL
         firstPage: MovieListResponse,
         service: MovieListService
     ) -> AllMoviesViewModel {
-        AllMoviesViewModel(
-            category: .popular,
-            firstPage: firstPage,
-            imageBaseURL: "",
-            movieListService: service,
-            moviesService: .mock(detail: .sample)
-        )
+        withDependencies {
+            $0.movieListService = service
+        } operation: {
+            AllMoviesViewModel(category: .popular, firstPage: firstPage)
+        }
     }
 
     @Test func `is seeded with the first page`() {
@@ -93,13 +91,8 @@ private func samplePage(_ page: Int, totalPages: Int, count: Int = 20) -> MovieL
     }
 
     @Test func `with no seed it starts empty and shows an error`() {
-        let sut = AllMoviesViewModel(
-            category: .popular,
-            firstPage: nil,
-            imageBaseURL: "",
-            movieListService: .failing(),
-            moviesService: .mock(detail: .sample)
-        )
+        // No page is fetched here, so the default test dependency is fine.
+        let sut = AllMoviesViewModel(category: .popular, firstPage: nil)
 
         #expect(sut.movies.isEmpty)
         #expect(sut.errorMessage != nil)

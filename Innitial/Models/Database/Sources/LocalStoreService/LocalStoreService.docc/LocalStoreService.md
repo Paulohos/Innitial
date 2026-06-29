@@ -251,19 +251,25 @@ use ``clearSession()``, que é cirúrgico.
 
 ## Como o app injeta tudo isso
 
-A `LocalStoreService` não é criada dentro da tela — ela é montada na raiz do app e
-**injetada** para baixo. No projeto isso vive no container `AppDependencies`:
+A `LocalStoreService` não é criada dentro da tela — ela é registrada no
+[swift-dependencies](https://github.com/pointfreeco/swift-dependencies) e resolvida via
+`@Dependency`. A chave vive junto do tipo (`LocalStoreService+Dependency.swift`):
 
 ```swift
-// AppDependencies (montado uma vez)
-let dependencies = AppDependencies.live()   // tem .configuration, .localStore, etc.
+extension LocalStoreService: DependencyKey {
+    public static var liveValue: LocalStoreService {
+        .live(keychainService: Bundle.main.bundleIdentifier ?? "Innitial")
+    }
+    public static var testValue: LocalStoreService { .inMemory() }
+}
 
-// a tela recebe só o que precisa:
-let viewModel = LoginViewModel(store: dependencies.localStore)
+// a tela/VM declara só o que precisa — sem threading por inicializadores:
+@Dependency(\.localStore) private var store
 ```
 
 Vantagem: a `LoginViewModel` depende de `LocalStoreService` (uma abstração), não de
-UserDefaults/Keychain direto. Nos testes você troca por `.inMemory()` e pronto.
+UserDefaults/Keychain direto. Nos testes você troca com
+`withDependencies { $0.localStore = .inMemory() }`.
 
 ## Testes
 

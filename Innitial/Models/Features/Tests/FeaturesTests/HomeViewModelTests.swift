@@ -1,21 +1,26 @@
 import Foundation
 import Testing
+import AppConfiguration
+import Dependencies
 import MovieListService
-import Movies
 @testable import Home
 
 @MainActor
 @Suite struct HomeViewModelTests {
 
+    /// Builds the SUT inside a `withDependencies` scope: the `@Dependency`
+    /// properties snapshot these values at init, so the overrides stick for the
+    /// view model's lifetime — and stay isolated from other (parallel) tests.
     private func makeSUT(
         movieListService: MovieListService,
         imageBaseURL: String = "https://image.tmdb.org/t/p"
     ) -> HomeViewModel {
-        HomeViewModel(
-            movieListService: movieListService,
-            moviesService: .mock(detail: .sample),
-            imageBaseURL: imageBaseURL
-        )
+        withDependencies {
+            $0.movieListService = movieListService
+            $0.configuration = .mock(bannerUrl: imageBaseURL)
+        } operation: {
+            HomeViewModel()
+        }
     }
 
     @Test func `load populates every carousel on success`() async {

@@ -6,7 +6,6 @@
 import SwiftUI
 import DesignSystem
 import MovieListService
-import Movies
 
 /// Full, paginated list of a category's movies — a 2-column grid with infinite scroll.
 struct AllMoviesView: View {
@@ -82,12 +81,6 @@ struct AllMoviesView: View {
 
 #Preview {
     NavigationStack {
-        AllMoviesView(viewModel: AllMoviesViewModel(
-            category: .popular,
-            firstPage: .sample,
-            imageBaseURL: "https://image.tmdb.org/t/p",
-            movieListService: .mock(popularMovies: .sample),
-            moviesService: .mock(detail: .sample)
-        ))
+        AllMoviesView(viewModel: AllMoviesViewModel(category: .popular, firstPage: .sample))
     }
 }

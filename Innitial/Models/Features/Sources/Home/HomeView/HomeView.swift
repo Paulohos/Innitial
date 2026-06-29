@@ -8,7 +8,6 @@
 import SwiftUI
 import DesignSystem
 import MovieListService
-import Movies
 
 public struct HomeView: View {
     @State private var viewModel: HomeViewModel
@@ -78,14 +77,7 @@ public struct HomeView: View {
 }
 
 #Preview {
-    HomeView(viewModel: HomeViewModel(
-        movieListService: .mock(
-            popularMovies: .sample,
-            topRatedMovies: .sample,
-            upcomingMovies: .sample,
-            nowPlayingMovies: .sample
-        ),
-        moviesService: .mock(detail: .sample),
-        imageBaseURL: "https://image.tmdb.org/t/p"
-    ))
+    // In the preview context swift-dependencies serves `previewValue`
+    // (sample data), so the carousels render without a network.
+    HomeView(viewModel: HomeViewModel())
 }
