@@ -13,7 +13,7 @@ extension Endpoint {
     var path: String {
         switch self {
         case .movieDetails(let id):
-            return "/movies/\(id)"
+            return "/movie/\(id)"
         case .popularMovies:
             return "/movie/popular"
         case .topRatedMovies:
@@ -27,9 +27,9 @@ extension Endpoint {
 
     var queryItems: [APIQueryItem] {
         switch self {
-        // `movieDetails` carries its id in the path (`/movies/{id}`), so no query item is needed.
+        // `movieDetails` carries its id in the path; it only needs the language.
         case .movieDetails:
-            return []
+            return [.keyValue(key: "language", value: "en-US")]
         case let .popularMovies(page),
              let .topRatedMovies(page),
              let .upcomingMovies(page),

@@ -326,15 +326,15 @@ struct NetworkServiceTests {
     }
 
     @Test
-    func `movieDetails carries the id in the path and not the query`() async throws {
+    func `movieDetails hits the movie detail path with the language query`() async throws {
         let store = try storeWithToken()
         let (sut, spy) = makeSUT(store: store) { .mock(data: emptyMock, status: 200) }
 
         let _: NoReply = try await sut.call(endpoint: .movieDetails(id: 42))
 
         let url = try #require(spy.request?.url)
-        #expect(url.absoluteString.hasSuffix("/movies/42"))
-        #expect(url.query == nil)
+        #expect(url.path.hasSuffix("/movie/42"))
+        #expect(url.query?.contains("language=en-US") == true)
     }
 
     // MARK: - Body

@@ -23,6 +23,10 @@ let package = Package(
             name: "MovieListService",
             targets: ["MovieListService"]
         ),
+        .library(
+            name: "Movies",
+            targets: ["Movies"]
+        ),
     ],
     dependencies: [
         .package(path: "../AppConfiguration"),
@@ -45,11 +49,21 @@ let package = Package(
             ],
         ),
         .target(
+            name: "Movies",
+            dependencies: [
+                "NetworkLayer"
+            ],
+        ),
+        .target(
             name: "Services"
         ),
         .testTarget(
             name: "ServicesTests",
             dependencies: ["Services"]
+        ),
+        .testTarget(
+            name: "MoviesTests",
+            dependencies: ["Movies"]
         ),
         .testTarget(
             name: "NetworkLayerTests",
