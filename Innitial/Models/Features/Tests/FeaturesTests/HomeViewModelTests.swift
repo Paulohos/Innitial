@@ -1,21 +1,30 @@
 import Foundation
 import Testing
 import MovieListService
+import Movies
 @testable import Home
 
 @MainActor
 @Suite struct HomeViewModelTests {
 
-    @Test func `load populates every carousel on success`() async {
-        let sut = HomeViewModel(
-            movieListService: .mock(
-                popularMovies: .sample,
-                topRatedMovies: .sample,
-                upcomingMovies: .sample,
-                nowPlayingMovies: .sample
-            ),
-            imageBaseURL: "https://image.tmdb.org/t/p"
+    private func makeSUT(
+        movieListService: MovieListService,
+        imageBaseURL: String = "https://image.tmdb.org/t/p"
+    ) -> HomeViewModel {
+        HomeViewModel(
+            movieListService: movieListService,
+            moviesService: .mock(detail: .sample),
+            imageBaseURL: imageBaseURL
         )
+    }
+
+    @Test func `load populates every carousel on success`() async {
+        let sut = makeSUT(movieListService: .mock(
+            popularMovies: .sample,
+            topRatedMovies: .sample,
+            upcomingMovies: .sample,
+            nowPlayingMovies: .sample
+        ))
         #expect(sut.popular.isEmpty)
 
         await sut.load()
@@ -30,7 +39,7 @@ import MovieListService
     }
 
     @Test func `load sets an error message on failure`() async {
-        let sut = HomeViewModel(movieListService: .failing(), imageBaseURL: "")
+        let sut = makeSUT(movieListService: .failing(), imageBaseURL: "")
 
         await sut.load()
 
@@ -43,10 +52,7 @@ import MovieListService
     }
 
     @Test func `posterURL builds the TMDB image path`() {
-        let sut = HomeViewModel(
-            movieListService: .mock(),
-            imageBaseURL: "https://image.tmdb.org/t/p"
-        )
+        let sut = makeSUT(movieListService: .mock())
         let movie = Movie.samples[0]
 
         let url = sut.posterURL(for: movie, size: "w500")
@@ -55,13 +61,10 @@ import MovieListService
     }
 
     @Test func `posterURL is nil without a base or a poster path`() {
-        let noBase = HomeViewModel(movieListService: .mock(), imageBaseURL: "")
+        let noBase = makeSUT(movieListService: .mock(), imageBaseURL: "")
         #expect(noBase.posterURL(for: Movie.samples[0]) == nil)
 
-        let sut = HomeViewModel(
-            movieListService: .mock(),
-            imageBaseURL: "https://image.tmdb.org/t/p"
-        )
+        let sut = makeSUT(movieListService: .mock())
         let noArtwork = Movie(
             id: 1, title: "X", originalTitle: "X", originalLanguage: "en", overview: "",
             posterPath: nil, backdropPath: nil, releaseDate: "", genreIDs: [],

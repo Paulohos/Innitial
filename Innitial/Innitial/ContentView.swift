@@ -9,6 +9,7 @@ import SwiftUI
 import AppDependencies
 import Home
 import MovieListService
+import Movies
 
 struct ContentView: View {
     // O ContentView é o composition root: monta o ViewModel da tela inicial
@@ -18,6 +19,7 @@ struct ContentView: View {
     init(dependencies: AppDependencies) {
         homeViewModel = HomeViewModel(
             movieListService: dependencies.movieListService,
+            moviesService: dependencies.moviesService,
             imageBaseURL: dependencies.imageBaseURL
         )
     }

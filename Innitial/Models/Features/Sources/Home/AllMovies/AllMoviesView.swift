@@ -6,10 +6,12 @@
 import SwiftUI
 import DesignSystem
 import MovieListService
+import Movies
 
 /// Full, paginated list of a category's movies — a 2-column grid with infinite scroll.
 struct AllMoviesView: View {
     @State private var viewModel: AllMoviesViewModel
+    @State private var selectedMovie: Movie?
 
     init(viewModel: AllMoviesViewModel) {
         _viewModel = State(initialValue: viewModel)
@@ -24,6 +26,9 @@ struct AllMoviesView: View {
         content
             .foregroundStyle(.white)
             .appBackground()
+            .sheet(item: $selectedMovie) { movie in
+                MovieDetailView(viewModel: viewModel.makeMovieDetailViewModel(for: movie))
+            }
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text(viewModel.title)
@@ -50,8 +55,12 @@ struct AllMoviesView: View {
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 20) {
                     ForEach(viewModel.movies) { movie in
-                        MovieGridItem(imageURL: viewModel.posterURL(for: movie), title: movie.title)
-                            .task { await viewModel.loadNextPageIfNeeded(currentItem: movie) }
+                        MovieGridItem(
+                            imageURL: viewModel.posterURL(for: movie),
+                            title: movie.title,
+                            action: { selectedMovie = movie }
+                        )
+                        .task { await viewModel.loadNextPageIfNeeded(currentItem: movie) }
                     }
                 }
                 .padding(.horizontal)
@@ -77,7 +86,8 @@ struct AllMoviesView: View {
             category: .popular,
             firstPage: .sample,
             imageBaseURL: "https://image.tmdb.org/t/p",
-            movieListService: .mock(popularMovies: .sample)
+            movieListService: .mock(popularMovies: .sample),
+            moviesService: .mock(detail: .sample)
         ))
     }
 }

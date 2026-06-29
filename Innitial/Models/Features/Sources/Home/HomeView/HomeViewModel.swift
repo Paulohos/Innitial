@@ -4,6 +4,7 @@
 
 import Foundation
 import MovieListService
+import Movies
 
 @MainActor
 @Observable
@@ -16,10 +17,12 @@ public final class HomeViewModel {
     public private(set) var errorMessage: String?
 
     private let movieListService: MovieListService
+    private let moviesService: MoviesService
     private let imageBaseURL: String
 
-    public init(movieListService: MovieListService, imageBaseURL: String) {
+    public init(movieListService: MovieListService, moviesService: MoviesService, imageBaseURL: String) {
         self.movieListService = movieListService
+        self.moviesService = moviesService
         self.imageBaseURL = imageBaseURL
     }
 
@@ -80,8 +83,14 @@ public final class HomeViewModel {
             category: category,
             firstPage: pages[category],
             imageBaseURL: imageBaseURL,
-            movieListService: movieListService
+            movieListService: movieListService,
+            moviesService: moviesService
         )
+    }
+
+    /// Builds the detail view model for a tapped movie (presented as a modal).
+    func makeMovieDetailViewModel(for movie: Movie) -> MovieDetailViewModel {
+        MovieDetailViewModel(movieID: movie.id, moviesService: moviesService, imageBaseURL: imageBaseURL)
     }
 
     // MARK: - Images

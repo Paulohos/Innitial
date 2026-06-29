@@ -2,6 +2,7 @@ import AppConfiguration
 import LocalStoreService
 import NetworkLayer
 import MovieListService
+import Movies
 
 /// The app's dependency container: holds one shared instance of each service.
 ///
@@ -12,6 +13,7 @@ public struct AppDependencies: Sendable {
     public var localStore: LocalStoreService
     public var network: NetworkService
     public var movieListService: MovieListService
+    public var moviesService: MoviesService
     // Add more services here as they appear, e.g.:
     // public var analytics: AnalyticsService
 
@@ -19,12 +21,14 @@ public struct AppDependencies: Sendable {
         configuration: EnvironmentConfigurationService,
         localStore: LocalStoreService,
         network: NetworkService,
-        movieListService: MovieListService
+        movieListService: MovieListService,
+        moviesService: MoviesService
     ) {
         self.configuration = configuration
         self.localStore = localStore
         self.network = network
         self.movieListService = movieListService
+        self.moviesService = moviesService
     }
 
     /// TMDB image base URL (from config), e.g. "https://image.tmdb.org/t/p".
@@ -43,7 +47,8 @@ extension AppDependencies {
             configuration: configuration,
             localStore: localStore,
             network: network,
-            movieListService: MovieListService.live(network)
+            movieListService: MovieListService.live(network),
+            moviesService: MoviesService.live(network)
         )
     }
 
@@ -55,7 +60,8 @@ extension AppDependencies {
             configuration: configuration,
             localStore: localStore,
             network: NetworkService.mock(appConfiguration: configuration, localStore: localStore),
-            movieListService: MovieListService.mock(popularMovies: .sample)
+            movieListService: MovieListService.mock(popularMovies: .sample),
+            moviesService: MoviesService.mock(detail: .sample)
         )
     }
 }

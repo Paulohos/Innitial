@@ -4,6 +4,7 @@
 
 import Foundation
 import MovieListService
+import Movies
 
 /// Drives the paginated "Ver todos" screen for a single category. It is self-contained:
 /// it holds the service and the category and issues its own requests (no callback to Home).
@@ -22,6 +23,7 @@ final class AllMoviesViewModel {
     private let totalPages: Int
     private let imageBaseURL: String
     private let movieListService: MovieListService
+    private let moviesService: MoviesService
 
     /// How many items from the end should trigger the next-page fetch.
     private let prefetchDistance = 10
@@ -30,7 +32,8 @@ final class AllMoviesViewModel {
         category: MovieCategory,
         firstPage: MovieListResponse?,
         imageBaseURL: String,
-        movieListService: MovieListService
+        movieListService: MovieListService,
+        moviesService: MoviesService
     ) {
         self.category = category
         self.movies = firstPage?.results ?? []
@@ -38,6 +41,7 @@ final class AllMoviesViewModel {
         self.totalPages = firstPage?.totalPages ?? 0
         self.imageBaseURL = imageBaseURL
         self.movieListService = movieListService
+        self.moviesService = moviesService
 
         // No seed means the category never loaded — surface an error instead of an empty screen.
         if firstPage == nil {
@@ -85,5 +89,10 @@ final class AllMoviesViewModel {
 
     func posterURL(for movie: Movie, size: String = "w500") -> URL? {
         HomeViewModel.posterURL(for: movie, imageBaseURL: imageBaseURL, size: size)
+    }
+
+    /// Builds the detail view model for a tapped movie (presented as a modal).
+    func makeMovieDetailViewModel(for movie: Movie) -> MovieDetailViewModel {
+        MovieDetailViewModel(movieID: movie.id, moviesService: moviesService, imageBaseURL: imageBaseURL)
     }
 }

@@ -30,6 +30,7 @@ let package = Package(
                 .product(name: "LocalStoreService", package: "Database"),
                 .product(name: "DesignSystem", package: "DesignSystem"),
                 .product(name: "MovieListService", package: "Services"),
+                .product(name: "Movies", package: "Services"),
             ]
         ),
         .testTarget(

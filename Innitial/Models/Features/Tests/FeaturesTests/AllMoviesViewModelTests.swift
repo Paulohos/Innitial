@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 import MovieListService
+import Movies
 @testable import Home
 
 // Free builders (no `self` capture) so they can be used inside `@Sendable` mock closures.
@@ -34,7 +35,8 @@ private func samplePage(_ page: Int, totalPages: Int, count: Int = 20) -> MovieL
             category: .popular,
             firstPage: firstPage,
             imageBaseURL: "",
-            movieListService: service
+            movieListService: service,
+            moviesService: .mock(detail: .sample)
         )
     }
 
@@ -95,7 +97,8 @@ private func samplePage(_ page: Int, totalPages: Int, count: Int = 20) -> MovieL
             category: .popular,
             firstPage: nil,
             imageBaseURL: "",
-            movieListService: .failing()
+            movieListService: .failing(),
+            moviesService: .mock(detail: .sample)
         )
 
         #expect(sut.movies.isEmpty)

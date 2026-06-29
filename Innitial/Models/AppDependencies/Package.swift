@@ -31,6 +31,7 @@ let package = Package(
                 .product(name: "LocalStoreService", package: "Database"),
                 .product(name: "NetworkLayer", package: "Services"),
                 .product(name: "MovieListService", package: "Services"),
+                .product(name: "Movies", package: "Services"),
             ]
         ),
         .testTarget(

@@ -8,10 +8,12 @@
 import SwiftUI
 import DesignSystem
 import MovieListService
+import Movies
 
 public struct HomeView: View {
     @State private var viewModel: HomeViewModel
     @State private var path = NavigationPath()
+    @State private var selectedMovie: Movie?
 
     public init(viewModel: HomeViewModel) {
         _viewModel = State(initialValue: viewModel)
@@ -32,6 +34,9 @@ public struct HomeView: View {
             .appBackground()
             .navigationDestination(for: MovieCategory.self) { category in
                 AllMoviesView(viewModel: viewModel.makeAllMoviesViewModel(for: category))
+            }
+            .sheet(item: $selectedMovie) { movie in
+                MovieDetailView(viewModel: viewModel.makeMovieDetailViewModel(for: movie))
             }
             #if os(iOS)
             .toolbar(.hidden, for: .navigationBar)
@@ -66,7 +71,7 @@ public struct HomeView: View {
             onSeeAll: viewModel.hasMorePages(for: category) ? { path.append(category) } : nil
         ) {
             ForEach(viewModel.movies(for: category)) { movie in
-                PosterCard(imageURL: viewModel.posterURL(for: movie))
+                PosterCard(imageURL: viewModel.posterURL(for: movie), action: { selectedMovie = movie })
             }
         }
     }
@@ -80,6 +85,7 @@ public struct HomeView: View {
             upcomingMovies: .sample,
             nowPlayingMovies: .sample
         ),
+        moviesService: .mock(detail: .sample),
         imageBaseURL: "https://image.tmdb.org/t/p"
     ))
 }
