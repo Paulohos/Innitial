@@ -56,7 +56,6 @@ struct AllMoviesView: View {
                     ForEach(viewModel.movies) { movie in
                         MovieGridItem(
                             imageURL: viewModel.posterURL(for: movie),
-                            title: movie.title,
                             action: { selectedMovie = movie }
                         )
                         .task { await viewModel.loadNextPageIfNeeded(currentItem: movie) }
