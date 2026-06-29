@@ -70,6 +70,15 @@ let package = Package(
             dependencies: ["MoviesService"]
         ),
         .testTarget(
+            name: "MovieListServiceTests",
+            dependencies: [
+                "MovieListService",
+                "NetworkLayer",
+                .product(name: "AppConfiguration", package: "AppConfiguration"),
+                .product(name: "LocalStoreService", package: "Database"),
+            ]
+        ),
+        .testTarget(
             name: "NetworkLayerTests",
             dependencies: [
                 "NetworkLayer",

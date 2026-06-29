@@ -63,6 +63,20 @@
     },
     {
       "target" : {
+        "containerPath" : "container:Models\/Services",
+        "identifier" : "MovieListServiceTests",
+        "name" : "MovieListServiceTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Models\/Services",
+        "identifier" : "MoviesServiceTests",
+        "name" : "MoviesServiceTests"
+      }
+    },
+    {
+      "target" : {
         "containerPath" : "container:Models\/DesignSystem",
         "identifier" : "DesignSystemTests",
         "name" : "DesignSystemTests"
