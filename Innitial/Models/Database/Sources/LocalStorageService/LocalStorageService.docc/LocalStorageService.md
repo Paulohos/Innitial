@@ -1,11 +1,11 @@
-# ``LocalStoreService``
+# ``LocalStorageService``
 
 Guarde dados do seu app no lugar certo — UserDefaults, Keychain ou arquivos —
 com **uma API só**, tipada e testável.
 
 ## Overview
 
-`LocalStoreService` é uma camadinha de persistência local. A ideia é simples:
+`LocalStorageService` é uma camadinha de persistência local. A ideia é simples:
 em vez de você lembrar "isso aqui vai no UserDefaults, aquilo no Keychain, e o
 JSON da API vai num arquivo", você declara **uma chave** dizendo onde a coisa
 mora, e o serviço cuida do resto.
@@ -19,7 +19,7 @@ disco). Você não precisa saber o caminho — só o número.
 
 ```
                          ┌─────────────────────┐
-   seu código  ───────►  │  LocalStoreService  │   ◄── é isso que você usa
+   seu código  ───────►  │  LocalStorageService  │   ◄── é isso que você usa
                          │     (a fachada)     │
                          └──────────┬──────────┘
                                     │ roteia pela chave
@@ -32,7 +32,7 @@ disco). Você não precisa saber o caminho — só o número.
 ```
 
 Cada caixa dessas é um ``KeyValueStore`` (o "motor" de baixo nível). Você
-raramente mexe nele direto — fala com a fachada ``LocalStoreService``.
+raramente mexe nele direto — fala com a fachada ``LocalStorageService``.
 
 ### Quando usar cada backend
 
@@ -50,17 +50,17 @@ Regra de bolso: **token e senha → Keychain**. **Preferência simples → UserD
 ### Passo 1 — Crie o serviço (uma vez, na raiz do app)
 
 ```swift
-import LocalStoreService
+import LocalStorageService
 
 // Produção: usa UserDefaults real, Keychain real e arquivos em Caches/
-let store = LocalStoreService.live(keychainService: "com.suaempresa.SeuApp")
+let store = LocalStorageService.live(keychainService: "com.suaempresa.SeuApp")
 
 // Testes / previews: tudo em memória, não toca em disco nenhum
-let store = LocalStoreService.inMemory()
+let store = LocalStorageService.inMemory()
 ```
 
 > Importante: crie **uma instância só** e passe ela adiante (injeção de dependência).
-> Não saia criando `LocalStoreService.live(...)` em todo lugar.
+> Não saia criando `LocalStorageService.live(...)` em todo lugar.
 
 ### Passo 2 — Declare suas chaves
 
@@ -108,9 +108,9 @@ Existem três formas de ler, dependendo do que "não existe" significa **naquele
 
 | Método | Devolve | Quando faltar |
 |---|---|---|
-| ``LocalStoreService/load(_:)`` | `Value?` | retorna `nil` (ausência é normal) |
-| ``LocalStoreService/require(_:)`` | `Value` | lança ``LocalStoreError/valueNotFound(key:)`` |
-| ``LocalStoreService/load(_:orThrow:)`` | `Value` | lança **o erro que você passar** |
+| ``LocalStorageService/load(_:)`` | `Value?` | retorna `nil` (ausência é normal) |
+| ``LocalStorageService/require(_:)`` | `Value` | lança ``LocalStorageError/valueNotFound(key:)`` |
+| ``LocalStorageService/load(_:orThrow:)`` | `Value` | lança **o erro que você passar** |
 
 **1) `load` — ausência é normal.** É o caso de conveniências (último e-mail, flag de
 onboarding): não ter ainda é esperado, não é erro.
@@ -136,7 +136,7 @@ do {
     let token = try store.require(\.authToken)   // String (não-opcional)
     // ...
 } catch {
-    // caiu aqui = token não estava salvo (LocalStoreError.valueNotFound)
+    // caiu aqui = token não estava salvo (LocalStorageError.valueNotFound)
 }
 ```
 
@@ -251,40 +251,40 @@ use ``clearSession()``, que é cirúrgico.
 
 ## Como o app injeta tudo isso
 
-A `LocalStoreService` não é criada dentro da tela — ela é registrada no
+A `LocalStorageService` não é criada dentro da tela — ela é registrada no
 [swift-dependencies](https://github.com/pointfreeco/swift-dependencies) e resolvida via
-`@Dependency`. A chave vive junto do tipo (`LocalStoreService+Dependency.swift`):
+`@Dependency`. A chave vive junto do tipo (`LocalStorageService+Dependency.swift`):
 
 ```swift
-extension LocalStoreService: DependencyKey {
-    public static var liveValue: LocalStoreService {
+extension LocalStorageService: DependencyKey {
+    public static var liveValue: LocalStorageService {
         .live(keychainService: Bundle.main.bundleIdentifier ?? "Innitial")
     }
-    public static var testValue: LocalStoreService { .inMemory() }
+    public static var testValue: LocalStorageService { .inMemory() }
 }
 
 // a tela/VM declara só o que precisa — sem threading por inicializadores:
-@Dependency(\.localStore) private var store
+@Dependency(\.localStorageService) private var store
 ```
 
-Vantagem: a `LoginViewModel` depende de `LocalStoreService` (uma abstração), não de
+Vantagem: a `LoginViewModel` depende de `LocalStorageService` (uma abstração), não de
 UserDefaults/Keychain direto. Nos testes você troca com
-`withDependencies { $0.localStore = .inMemory() }`.
+`withDependencies { $0.localStorageService = .inMemory() }`.
 
 ## Testes
 
-Use sempre ``LocalStoreService/inMemory()`` — é rápido, determinístico e não suja o
+Use sempre ``LocalStorageService/inMemory()`` — é rápido, determinístico e não suja o
 UserDefaults/Keychain reais da máquina.
 
 ```swift
 @Test func salvaEbusca() throws {
-    let store = LocalStoreService.inMemory()
+    let store = LocalStorageService.inMemory()
     try store.save("a@b.com", for: \.lastUsedLoginEmail)
     #expect(try store.load(\.lastUsedLoginEmail) == "a@b.com")
 }
 
 @Test func cacheVence() throws {
-    let store = LocalStoreService.inMemory()
+    let store = LocalStorageService.inMemory()
     let url = URL(string: "https://x.com/a")!
     let t0 = Date(timeIntervalSince1970: 0)
 
@@ -315,7 +315,7 @@ do {
 UserDefaults não lança; o FileSystem lança erros de I/O do Foundation. Na maioria
 dos casos um `try?` resolve, mas o `throws` está aí quando você quiser tratar.
 
-Além disso, ``require(_:)`` lança ``LocalStoreError/valueNotFound(key:)`` quando uma
+Além disso, ``require(_:)`` lança ``LocalStorageError/valueNotFound(key:)`` quando uma
 chave obrigatória está vazia (veja "Lendo valores: três sabores").
 
 ## Perguntas frequentes (e pegadinhas)
@@ -342,7 +342,7 @@ Em `StorageKeys+Keys.swift`, dentro de `extension StorageKeys`. Uma linha por ch
 ## Topics
 
 ### Tipo principal
-- ``LocalStoreService``
+- ``LocalStorageService``
 
 ### Chaves
 - ``StorageKey``
@@ -354,4 +354,4 @@ Em `StorageKeys+Keys.swift`, dentro de `extension StorageKeys`. Uma linha por ch
 
 ### Erros
 - ``KeychainError``
-- ``LocalStoreError``
+- ``LocalStorageError``

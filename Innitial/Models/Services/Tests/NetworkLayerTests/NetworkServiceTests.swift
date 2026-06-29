@@ -1,6 +1,6 @@
 import AppConfiguration
 import Foundation
-import LocalStoreService
+import LocalStorageService
 import Testing
 
 @testable import NetworkLayer
@@ -49,7 +49,7 @@ struct NetworkServiceTests {
             systemVersion: "17.0",
             timeZoneIdentifier: "America/Sao_Paulo"
         ),
-        store: LocalStoreService,
+        store: LocalStorageService,
         retryOn401: @Sendable @escaping (@escaping (Result<Void, Error>) -> Void) -> Void = { completion in
             completion(.failure(NetworkServiceError.authenticationFailure))
         },
@@ -58,7 +58,7 @@ struct NetworkServiceTests {
         let spy = RequestSpy()
         let sut = NetworkService.testMock(
             appConfiguration: configuration,
-            localStore: store,
+            localStorageService: store,
             retryOn401: retryOn401,
             mockValueProvider: { request in
                 spy.capture(request)
@@ -68,8 +68,8 @@ struct NetworkServiceTests {
         return (sut, spy)
     }
 
-    private func storeWithToken(_ token: String = "abc123") throws -> LocalStoreService {
-        let store = LocalStoreService.inMemory()
+    private func storeWithToken(_ token: String = "abc123") throws -> LocalStorageService {
+        let store = LocalStorageService.inMemory()
         try store.save(token, for: \.authToken)
         return store
     }
@@ -113,7 +113,7 @@ struct NetworkServiceTests {
     func `a missing auth token fails the request with the default error`() async throws {
         // No access token configured → getHeaders masks it into the default error.
         let configuration = EnvironmentConfigurationService.mock(baseUrl: "https://api.test")
-        let store = LocalStoreService.inMemory()
+        let store = LocalStorageService.inMemory()
         let (sut, _) = makeSUT(configuration: configuration, store: store) { .mock(data: emptyMock, status: 200) }
 
         do {

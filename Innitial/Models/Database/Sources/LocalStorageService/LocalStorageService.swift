@@ -18,7 +18,7 @@ import Foundation
 ///
 /// Offline API responses are cached on disk via the URL-keyed
 /// ``cacheResponse(_:for:now:)`` / ``cachedResponseData(for:maxAge:now:)`` API.
-public struct LocalStoreService: Sendable {
+public struct LocalStorageService: Sendable {
     private let userDefaults: KeyValueStore
     private let keychain: KeyValueStore
     let fileSystem: KeyValueStore
@@ -63,19 +63,19 @@ public struct LocalStoreService: Sendable {
 // MARK: - Required reads (throw instead of returning nil)
 
 /// Error thrown when a value that *must* exist is missing.
-public enum LocalStoreError: Error, Sendable, Equatable {
+public enum LocalStorageError: Error, Sendable, Equatable {
     case valueNotFound(key: String)
 }
 
-extension LocalStoreService {
+extension LocalStorageService {
     /// Like ``load(_:)`` but returns a **non-optional** value, throwing
-    /// ``LocalStoreError/valueNotFound(key:)`` when nothing is stored.
+    /// ``LocalStorageError/valueNotFound(key:)`` when nothing is stored.
     /// Use for keys that must exist in context (e.g. the auth token on an
     /// authenticated request).
     public func require<Value>(_ keyPath: KeyPath<StorageKeys, StorageKey<Value>>) throws -> Value {
         let key = StorageKeys()[keyPath: keyPath]
         guard let value = try store(for: key.backend).value(Value.self, forKey: key.name) else {
-            throw LocalStoreError.valueNotFound(key: key.name)
+            throw LocalStorageError.valueNotFound(key: key.name)
         }
         return value
     }
@@ -95,7 +95,7 @@ extension LocalStoreService {
 
 // MARK: - Bulk removal
 
-extension LocalStoreService {
+extension LocalStorageService {
     /// Wipes **everything** this service can reach: the app's UserDefaults domain,
     /// every Keychain item under its service, and every cached response file.
     ///
@@ -120,7 +120,7 @@ extension LocalStoreService {
 
 // MARK: - Factories
 
-extension LocalStoreService {
+extension LocalStorageService {
     /// Production store: `UserDefaults.standard` + Keychain under `keychainService`
     /// + a file-system cache for API responses (in Caches/ResponsesCache).
     public static func live(keychainService: String) -> Self {

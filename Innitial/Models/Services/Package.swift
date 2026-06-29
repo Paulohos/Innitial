@@ -40,7 +40,7 @@ let package = Package(
             name: "NetworkLayer",
             dependencies: [
                 .product(name: "AppConfiguration", package: "AppConfiguration"),
-                .product(name: "LocalStoreService", package: "Database"),
+                .product(name: "LocalStorageService", package: "Database"),
                 .product(name: "Dependencies", package: "swift-dependencies"),
             ],
         ),
@@ -75,7 +75,7 @@ let package = Package(
                 "MovieListService",
                 "NetworkLayer",
                 .product(name: "AppConfiguration", package: "AppConfiguration"),
-                .product(name: "LocalStoreService", package: "Database"),
+                .product(name: "LocalStorageService", package: "Database"),
             ]
         ),
         .testTarget(
@@ -83,7 +83,7 @@ let package = Package(
             dependencies: [
                 "NetworkLayer",
                 .product(name: "AppConfiguration", package: "AppConfiguration"),
-                .product(name: "LocalStoreService", package: "Database"),
+                .product(name: "LocalStorageService", package: "Database"),
             ]
         ),
     ],

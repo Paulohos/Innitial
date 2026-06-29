@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		FA310E492FF16B6D0086E840 /* AllTests.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = FA310E482FF16B6D0086E840 /* AllTests.xctestplan */; };
 		FA929D402FF188C300D6F5E8 /* Home in Frameworks */ = {isa = PBXBuildFile; productRef = FA929D3F2FF188C300D6F5E8 /* Home */; };
-		FAE22FA32FF30F3100C75A31 /* LocalStoreService in Frameworks */ = {isa = PBXBuildFile; productRef = FAE22FA22FF30F3100C75A31 /* LocalStoreService */; };
+		FAE22FA32FF30F3100C75A31 /* LocalStorageService in Frameworks */ = {isa = PBXBuildFile; productRef = FAE22FA22FF30F3100C75A31 /* LocalStorageService */; };
 		FAE22FA52FF30F3E00C75A31 /* AppConfiguration in Frameworks */ = {isa = PBXBuildFile; productRef = FAE22FA42FF30F3E00C75A31 /* AppConfiguration */; };
 		FAE22FA72FF30F4600C75A31 /* NetworkLayer in Frameworks */ = {isa = PBXBuildFile; productRef = FAE22FA62FF30F4600C75A31 /* NetworkLayer */; };
 		FAE22FA92FF30F4D00C75A31 /* MovieListService in Frameworks */ = {isa = PBXBuildFile; productRef = FAE22FA82FF30F4D00C75A31 /* MovieListService */; };
@@ -88,7 +88,7 @@
 				FAE22FA52FF30F3E00C75A31 /* AppConfiguration in Frameworks */,
 				FAE22FA72FF30F4600C75A31 /* NetworkLayer in Frameworks */,
 				FA929D402FF188C300D6F5E8 /* Home in Frameworks */,
-				FAE22FA32FF30F3100C75A31 /* LocalStoreService in Frameworks */,
+				FAE22FA32FF30F3100C75A31 /* LocalStorageService in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -174,7 +174,7 @@
 			name = Innitial;
 			packageProductDependencies = (
 				FA929D3F2FF188C300D6F5E8 /* Home */,
-				FAE22FA22FF30F3100C75A31 /* LocalStoreService */,
+				FAE22FA22FF30F3100C75A31 /* LocalStorageService */,
 				FAE22FA42FF30F3E00C75A31 /* AppConfiguration */,
 				FAE22FA62FF30F4600C75A31 /* NetworkLayer */,
 				FAE22FA82FF30F4D00C75A31 /* MovieListService */,
@@ -648,9 +648,9 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = Home;
 		};
-		FAE22FA22FF30F3100C75A31 /* LocalStoreService */ = {
+		FAE22FA22FF30F3100C75A31 /* LocalStorageService */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = LocalStoreService;
+			productName = LocalStorageService;
 		};
 		FAE22FA42FF30F3E00C75A31 /* AppConfiguration */ = {
 			isa = XCSwiftPackageProductDependency;

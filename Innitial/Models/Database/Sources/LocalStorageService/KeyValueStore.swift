@@ -12,7 +12,7 @@ let sharedJSONDecoder = JSONDecoder()
 /// `Codable` helpers (`set(_:forKey:)` / `value(_:forKey:)`) to store primitives
 /// (`Int`, `String`, `Bool`, ...) or custom `Codable` objects with one uniform API.
 ///
-/// You normally don't use this directly — `LocalStoreService` composes these
+/// You normally don't use this directly — `LocalStorageService` composes these
 /// (UserDefaults + Keychain + file system) and routes by key. Pick a backend via a factory:
 /// - ``userDefaults(_:domainName:)``
 /// - ``keychain(service:accessGroup:)``

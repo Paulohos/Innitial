@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 import AppConfiguration
-import LocalStoreService
+import LocalStorageService
 import NetworkLayer
 @testable import MovieListService
 
@@ -12,11 +12,11 @@ struct MovieListServiceTests {
     /// `data`/`status`. The store carries an auth token so the request is allowed
     /// through (mirrors the NetworkLayer tests).
     private func liveSUT(status: Int = 200, data: Data = popularPageMock) throws -> MovieListService {
-        let store = LocalStoreService.inMemory()
+        let store = LocalStorageService.inMemory()
         try store.save("token", for: \.authToken)
         let network = NetworkService.mock(
             appConfiguration: .mock(baseUrl: "https://api.test", accessToken: "abc123"),
-            localStore: store,
+            localStorageService: store,
             mockValueProvider: { .mock(data: data, status: status) }
         )
         return .live(network)

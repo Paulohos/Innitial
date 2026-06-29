@@ -1,6 +1,6 @@
 import AppConfiguration
 import Foundation
-import LocalStoreService
+import LocalStorageService
 import os
 
 /// Shared logger for the networking layer. Use this instead of `print` so output
@@ -16,7 +16,7 @@ public struct NetworkService: Sendable {
     /// Lets us access properties that we need to send to the server with every request
     let appConfiguration: EnvironmentConfigurationService
     /// Used to retrieve the `.endpoint` for API requests that need it
-    let localStore: LocalStoreService
+    let localStorageService: LocalStorageService
     /// Hook for refreshing credentials when a request comes back `401`. It is given a
     /// completion that it must call with `.success` (retry the original request) or
     /// `.failure` (give up). Provided at construction by the composition root; the
@@ -30,13 +30,13 @@ public struct NetworkService: Sendable {
 
     public init(
         appConfiguration: EnvironmentConfigurationService,
-        localStore: LocalStoreService,
+        localStorageService: LocalStorageService,
         retryOn401: @Sendable @escaping (@escaping (Result<Void, Error>) -> Void) -> Void = { completion in
             completion(.failure(NetworkServiceError.authenticationFailure))
         },
         baseNetworkRequest: @Sendable @escaping (URLRequest) async throws -> (Data, URLResponse)) {
         self.appConfiguration = appConfiguration
-        self.localStore = localStore
+        self.localStorageService = localStorageService
         self.retryOn401 = retryOn401
         self.baseNetworkRequest = baseNetworkRequest
     }

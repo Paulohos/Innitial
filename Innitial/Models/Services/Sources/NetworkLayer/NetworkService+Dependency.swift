@@ -11,12 +11,12 @@ import Dependencies
 extension NetworkService: DependencyKey {
     public static var liveValue: NetworkService {
         @Dependency(\.configuration) var configuration
-        @Dependency(\.localStore) var localStore
-        return .live(appConfiguration: configuration, localStore: localStore)
+        @Dependency(\.localStorageService) var localStorageService
+        return .live(appConfiguration: configuration, localStorageService: localStorageService)
     }
 
     public static var testValue: NetworkService {
-        .mock(appConfiguration: .mock(), localStore: .inMemory())
+        .mock(appConfiguration: .mock(), localStorageService: .inMemory())
     }
 }
 

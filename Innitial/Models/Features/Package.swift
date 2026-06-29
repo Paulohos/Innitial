@@ -30,7 +30,7 @@ let package = Package(
             name: "Home",
             dependencies: [
                 .product(name: "AppConfiguration", package: "AppConfiguration"),
-                .product(name: "LocalStoreService", package: "Database"),
+                .product(name: "LocalStorageService", package: "Database"),
                 .product(name: "DesignSystem", package: "DesignSystem"),
                 .product(name: "MovieListService", package: "Services"),
                 .product(name: "MoviesService", package: "Services"),

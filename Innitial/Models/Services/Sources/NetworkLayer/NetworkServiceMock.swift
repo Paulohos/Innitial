@@ -1,5 +1,5 @@
 import AppConfiguration
-import LocalStoreService
+import LocalStorageService
 import Foundation
 
 public typealias NetworkResponse = Result<(Data, HTTPURLResponse), Error>
@@ -16,7 +16,7 @@ extension NetworkService {
     /// @Test func decodesBody() async throws {
     ///     let sut = NetworkService.mock(
     ///         appConfiguration: .mock(),
-    ///         localStore: .inMemory(),
+    ///         localStorageService: .inMemory(),
     ///         mockValueProvider: { .mock(data: dummyMock, status: 200) }
     ///     )
     ///     let result: Dummy = try await sut.call(endpoint: .popularMovies(page: 1))
@@ -29,7 +29,7 @@ extension NetworkService {
     /// let queue = ResponseQueue([.mock(status: 401), .mock(data: dummyMock, status: 200)])
     /// let sut = NetworkService.mock(
     ///     appConfiguration: .mock(),
-    ///     localStore: .inMemory(),
+    ///     localStorageService: .inMemory(),
     ///     mockValueProvider: { queue.next() }
     /// )
     /// ```
@@ -39,13 +39,13 @@ extension NetworkService {
     ///
     /// - Parameters:
     ///   - appConfiguration: AppConfiguration dependency
-    ///   - localStore: LocalStoreService dependency
+    ///   - localStorageService: LocalStorageService dependency
     ///   - mockValueProvider: Supplies the response the service returns for each request.
     ///     Defaults to an empty `200`.
     /// - Returns: A NetworkService mock object
     public static func mock(
         appConfiguration: EnvironmentConfigurationService,
-        localStore: LocalStoreService,
+        localStorageService: LocalStorageService,
         retryOn401: @Sendable @escaping (@escaping (Result<Void, Error>) -> Void) -> Void = { completion in
             completion(.failure(NetworkServiceError.authenticationFailure))
         },
@@ -57,7 +57,7 @@ extension NetworkService {
     ) -> NetworkService {
         .init(
             appConfiguration: appConfiguration,
-            localStore: localStore,
+            localStorageService: localStorageService,
             retryOn401: retryOn401,
             baseNetworkRequest: { _ in
                 switch mockValueProvider() {

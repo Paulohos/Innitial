@@ -1,6 +1,6 @@
 import AppConfiguration
 import Foundation
-import LocalStoreService
+import LocalStorageService
 
 extension NetworkService {
     /// "Live" constructor for NetworkService
@@ -11,20 +11,20 @@ extension NetworkService {
     ///
     /// - Parameters:
     ///   - appConfiguration: AppConfiguration dependency
-    ///   - localStore: LocalStoreService dependency
+    ///   - localStorageService: LocalStorageService dependency
     ///   - retryOn401: Optional 401 refresh handler. Defaults to one that fails, so 401s
     ///     are treated as hard authentication failures unless the composition root injects one.
     /// - Returns: A live `NetworkService`
     public static func live(
         appConfiguration: EnvironmentConfigurationService,
-        localStore: LocalStoreService,
+        localStorageService: LocalStorageService,
         retryOn401: @Sendable @escaping (@escaping (Result<Void, Error>) -> Void) -> Void = { completion in
             completion(.failure(NetworkServiceError.authenticationFailure))
         }
     ) -> NetworkService {
         .init(
             appConfiguration: appConfiguration,
-            localStore: localStore,
+            localStorageService: localStorageService,
             retryOn401: retryOn401,
             baseNetworkRequest: {
                 return try await URLSession.shared.data(for: $0)
@@ -35,7 +35,7 @@ extension NetworkService {
     /// This is for testing the live network service; it gives us an opportunity to capture the `URLRequest` that's sent so we can test on it
     static func testMock(
         appConfiguration: EnvironmentConfigurationService,
-        localStore: LocalStoreService,
+        localStorageService: LocalStorageService,
         retryOn401: @Sendable @escaping (@escaping (Result<Void, Error>) -> Void) -> Void = { completion in
             completion(.failure(NetworkServiceError.authenticationFailure))
         },
@@ -43,7 +43,7 @@ extension NetworkService {
     ) -> NetworkService {
         .init(
             appConfiguration: appConfiguration,
-            localStore: localStore,
+            localStorageService: localStorageService,
             retryOn401: retryOn401,
             baseNetworkRequest: { request in
                 switch mockValueProvider(request) {

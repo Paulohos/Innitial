@@ -12,8 +12,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "LocalStoreService",
-            targets: ["LocalStoreService"]
+            name: "LocalStorageService",
+            targets: ["LocalStorageService"]
         ),
     ],
     dependencies: [
@@ -23,14 +23,14 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "LocalStoreService",
+            name: "LocalStorageService",
             dependencies: [
                 .product(name: "Dependencies", package: "swift-dependencies"),
             ]
         ),
         .testTarget(
             name: "DatabaseTests",
-            dependencies: ["LocalStoreService"]
+            dependencies: ["LocalStorageService"]
         ),
     ],
     swiftLanguageModes: [.v6]

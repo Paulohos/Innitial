@@ -85,7 +85,7 @@ extension NetworkService {
         if endpoint.requiresAccessToken {
             // O token da TMDB é de app (read access token), não por usuário: vem do
             // AppConfiguration (Info.plist), não mais do Keychain via login (removido).
-            // let authToken: String = try localStore.require(\.authToken)
+            // let authToken: String = try localStorageService.require(\.authToken)
             let authToken = appConfiguration.accessToken()
             guard !authToken.isEmpty else {
                 throw handleErrorReturns(

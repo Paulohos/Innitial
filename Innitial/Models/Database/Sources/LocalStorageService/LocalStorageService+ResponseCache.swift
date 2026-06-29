@@ -7,7 +7,7 @@ struct CachedResponse: Codable, Sendable {
     let storedAt: Date
 }
 
-extension LocalStoreService {
+extension LocalStorageService {
     /// Caches the raw response bytes for `url` (offline support).
     ///
     /// The key is the request URL; the bytes are wrapped with a timestamp and
