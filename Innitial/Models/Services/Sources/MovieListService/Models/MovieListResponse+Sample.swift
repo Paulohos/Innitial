@@ -77,7 +77,7 @@ public extension MovieListResponse {
     static let sample = MovieListResponse(
         page: 1,
         results: Movie.samples,
-        totalPages: 1,
+        totalPages: 2,
         totalResults: 369
     )
 }

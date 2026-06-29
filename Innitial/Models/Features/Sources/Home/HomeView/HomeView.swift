@@ -11,23 +11,32 @@ import MovieListService
 
 public struct HomeView: View {
     @State private var viewModel: HomeViewModel
+    @State private var path = NavigationPath()
 
     public init(viewModel: HomeViewModel) {
         _viewModel = State(initialValue: viewModel)
     }
 
     public var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                HomeHeader()
-                    .padding(.horizontal)
+        NavigationStack(path: $path) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    HomeHeader()
+                        .padding(.horizontal)
 
-                content
+                    content
+                }
+                .padding(.vertical)
             }
-            .padding(.vertical)
+            .foregroundStyle(.white)
+            .appBackground()
+            .navigationDestination(for: MovieCategory.self) { category in
+                AllMoviesView(viewModel: viewModel.makeAllMoviesViewModel(for: category))
+            }
+            #if os(iOS)
+            .toolbar(.hidden, for: .navigationBar)
+            #endif
         }
-        .foregroundStyle(.white)
-        .appBackground()
         .task { await viewModel.load() }
     }
 
@@ -44,16 +53,19 @@ public struct HomeView: View {
                 .frame(maxWidth: .infinity)
                 .padding()
         } else {
-            carousel(title: "Mais populares", movies: viewModel.popular)
-            carousel(title: "Mais bem avaliados", movies: viewModel.topRated)
-            carousel(title: "Em cartaz", movies: viewModel.nowPlaying)
-            carousel(title: "Em breve", movies: viewModel.upcoming)
+            carousel(.popular)
+            carousel(.topRated)
+            carousel(.nowPlaying)
+            carousel(.upcoming)
         }
     }
 
-    private func carousel(title: String, movies: [Movie]) -> some View {
-        CarouselSection(title: title, onSeeAll: { /* TODO: navegar para a lista completa */ }) {
-            ForEach(movies) { movie in
+    private func carousel(_ category: MovieCategory) -> some View {
+        CarouselSection(
+            title: category.title,
+            onSeeAll: viewModel.hasMorePages(for: category) ? { path.append(category) } : nil
+        ) {
+            ForEach(viewModel.movies(for: category)) { movie in
                 PosterCard(imageURL: viewModel.posterURL(for: movie))
             }
         }

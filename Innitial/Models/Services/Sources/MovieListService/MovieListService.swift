@@ -79,5 +79,16 @@ extension MovieListService {
             fetchNowPlayingMovies: { _ in throw error }
         )
     }
+
+    /// A mock where every category returns `make(page)` for the requested page —
+    /// for testing / previewing pagination.
+    public static func paging(_ make: @escaping @Sendable (_ page: Int) -> MovieListResponse) -> Self {
+        .init(
+            fetchListOfPopularMovies: { make($0) },
+            fetchTopRatedMovies: { make($0) },
+            fetchUpcomingMovies: { make($0) },
+            fetchNowPlayingMovies: { make($0) }
+        )
+    }
 }
 #endif
