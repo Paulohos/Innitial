@@ -45,6 +45,7 @@
 		FABEB5F72FF04F2F0065F069 /* Innitial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Innitial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FABEB6042FF04F300065F069 /* InnitialTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InnitialTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FABEB60E2FF04F300065F069 /* InnitialUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InnitialUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FAE2303C2FF3FC1700C75A31 /* Connectivity */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Connectivity; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -142,10 +143,11 @@
 		FABEB6212FF04F420065F069 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				FA310E4A2FF174480086E840 /* DesignSystem */,
 				FA9237D02FF086A00036D324 /* AnalyticsKit */,
 				FA9237D12FF086A00036D324 /* AppConfiguration */,
+				FAE2303C2FF3FC1700C75A31 /* Connectivity */,
 				FA9237D22FF086A00036D324 /* Core */,
+				FA310E4A2FF174480086E840 /* DesignSystem */,
 				FA9237D32FF086A00036D324 /* Database */,
 				FA9237D42FF086A00036D324 /* Features */,
 				FA9237D52FF086A00036D324 /* Services */,
