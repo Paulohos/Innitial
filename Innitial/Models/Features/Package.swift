@@ -18,6 +18,7 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../AppConfiguration"),
+        .package(path: "../Connectivity"),
         .package(path: "../Database"),
         .package(path: "../DesignSystem"),
         .package(path: "../Services"),
@@ -30,6 +31,7 @@ let package = Package(
             name: "Home",
             dependencies: [
                 .product(name: "AppConfiguration", package: "AppConfiguration"),
+                .product(name: "Connectivity", package: "Connectivity"),
                 .product(name: "LocalStorageService", package: "Database"),
                 .product(name: "DesignSystem", package: "DesignSystem"),
                 .product(name: "MovieListService", package: "Services"),
@@ -42,6 +44,7 @@ let package = Package(
             dependencies: [
                 "Home",
                 .product(name: "AppConfiguration", package: "AppConfiguration"),
+                .product(name: "Connectivity", package: "Connectivity"),
                 .product(name: "MovieListService", package: "Services"),
                 .product(name: "MoviesService", package: "Services"),
                 .product(name: "Dependencies", package: "swift-dependencies"),

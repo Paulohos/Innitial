@@ -9,4 +9,13 @@ public extension Color {
 
     /// Lower shade of the app's dark background gradient — `#15151D`.
     static let backgroundBottom = Color(hex: 0x15151D)
+
+    /// Surface for transient status banners (e.g. "sem conexão") — `#1C1C1E`.
+    static let bannerSurface = Color(hex: 0x1C1C1E)
+
+    /// Error / offline accent — iOS system red `#FF3B30`.
+    static let statusError = Color(hex: 0xFF3B30)
+
+    /// Success / reconnected accent — iOS system green `#34C759`.
+    static let statusOnline = Color(hex: 0x34C759)
 }
