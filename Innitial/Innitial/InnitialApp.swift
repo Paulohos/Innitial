@@ -6,16 +6,13 @@
 //
 
 import SwiftUI
-import AppDependencies
+import Home
 
 @main
 struct InnitialApp: App {
-    // Instância única dos services, montada no composition root.
-    private let dependencies = AppDependencies.live()
-
     var body: some Scene {
         WindowGroup {
-            ContentView(dependencies: dependencies)
+            ContentView()
         }
     }
 }

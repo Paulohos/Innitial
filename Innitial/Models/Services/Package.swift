@@ -19,10 +19,19 @@ let package = Package(
             name: "NetworkLayer",
             targets: ["NetworkLayer"]
         ),
+        .library(
+            name: "MovieListService",
+            targets: ["MovieListService"]
+        ),
+        .library(
+            name: "MoviesService",
+            targets: ["MoviesService"]
+        ),
     ],
     dependencies: [
         .package(path: "../AppConfiguration"),
         .package(path: "../Database"),
+        .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -31,7 +40,22 @@ let package = Package(
             name: "NetworkLayer",
             dependencies: [
                 .product(name: "AppConfiguration", package: "AppConfiguration"),
-                .product(name: "LocalStoreService", package: "Database"),
+                .product(name: "LocalStorageService", package: "Database"),
+                .product(name: "Dependencies", package: "swift-dependencies"),
+            ],
+        ),
+        .target(
+            name: "MovieListService",
+            dependencies: [
+                "NetworkLayer",
+                .product(name: "Dependencies", package: "swift-dependencies"),
+            ],
+        ),
+        .target(
+            name: "MoviesService",
+            dependencies: [
+                "NetworkLayer",
+                .product(name: "Dependencies", package: "swift-dependencies"),
             ],
         ),
         .target(
@@ -42,11 +66,24 @@ let package = Package(
             dependencies: ["Services"]
         ),
         .testTarget(
+            name: "MoviesServiceTests",
+            dependencies: ["MoviesService"]
+        ),
+        .testTarget(
+            name: "MovieListServiceTests",
+            dependencies: [
+                "MovieListService",
+                "NetworkLayer",
+                .product(name: "AppConfiguration", package: "AppConfiguration"),
+                .product(name: "LocalStorageService", package: "Database"),
+            ]
+        ),
+        .testTarget(
             name: "NetworkLayerTests",
             dependencies: [
                 "NetworkLayer",
                 .product(name: "AppConfiguration", package: "AppConfiguration"),
-                .product(name: "LocalStoreService", package: "Database"),
+                .product(name: "LocalStorageService", package: "Database"),
             ]
         ),
     ],

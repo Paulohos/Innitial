@@ -2,6 +2,12 @@ import Foundation
 
 public struct EnvironmentConfigurationService: Sendable {
     public let baseUrl: @Sendable () -> String
+    /// Base URL for TMDB image/banner artwork, e.g. "https://image.tmdb.org/t/p".
+    public let bannerUrl: @Sendable () -> String
+    /// TMDB v3 API key (query-param auth).
+    public let apiKey: @Sendable () -> String
+    /// TMDB v4 read access token (Bearer auth).
+    public let accessToken: @Sendable () -> String
     public let bundleID: @Sendable () -> String
     public let termsOfUse: @Sendable () -> String
     public let privacyPolicy: @Sendable () -> String
@@ -30,6 +36,9 @@ extension EnvironmentConfigurationService {
         func value(_ name: String) -> String { settings[name] as? String ?? "" }
 
         let baseUrl = value("baseURL")
+        let bannerUrl = value("bannerUrl")
+        let apiKey = value("apiKey")
+        let accessToken = value("accessToken")
         let bundleID = value("bundleId")
         let termsOfUse = value("termsOfUseURL")
         let privacyPolicy = value("privacyPolicyUrl")
@@ -37,6 +46,9 @@ extension EnvironmentConfigurationService {
 
         return .init(
             baseUrl: { baseUrl },
+            bannerUrl: { bannerUrl },
+            apiKey: { apiKey },
+            accessToken: { accessToken },
             bundleID: { bundleID },
             termsOfUse: { termsOfUse },
             privacyPolicy: { privacyPolicy },
@@ -54,6 +66,9 @@ extension EnvironmentConfigurationService {
 
     public static func mock(
        baseUrl: String? = nil,
+       bannerUrl: String? = nil,
+       apiKey: String? = nil,
+       accessToken: String? = nil,
        bundleID: String? = nil,
        termsOfUse: String? = nil,
        privacyPolicy: String? = nil,
@@ -64,6 +79,9 @@ extension EnvironmentConfigurationService {
     ) -> Self {
         .init(
            baseUrl: { baseUrl ?? "" },
+           bannerUrl: { bannerUrl ?? "" },
+           apiKey: { apiKey ?? "" },
+           accessToken: { accessToken ?? "" },
            bundleID: { bundleID ?? "" },
            termsOfUse: { termsOfUse ?? "" },
            privacyPolicy: { privacyPolicy ?? "" },

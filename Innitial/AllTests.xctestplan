@@ -21,13 +21,6 @@
     },
     {
       "target" : {
-        "containerPath" : "container:Models\/AppDependencies",
-        "identifier" : "AppDependenciesTests",
-        "name" : "AppDependenciesTests"
-      }
-    },
-    {
-      "target" : {
         "containerPath" : "container:Models\/Features",
         "identifier" : "FeaturesTests",
         "name" : "FeaturesTests"
@@ -66,6 +59,20 @@
         "containerPath" : "container:Models\/Services",
         "identifier" : "NetworkLayerTests",
         "name" : "NetworkLayerTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Models\/Services",
+        "identifier" : "MovieListServiceTests",
+        "name" : "MovieListServiceTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Models\/Services",
+        "identifier" : "MoviesServiceTests",
+        "name" : "MoviesServiceTests"
       }
     },
     {

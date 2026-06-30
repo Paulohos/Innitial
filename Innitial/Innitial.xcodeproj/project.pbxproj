@@ -7,9 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FA2F5E7E2FF0709000BB0A7E /* AppDependencies in Frameworks */ = {isa = PBXBuildFile; productRef = FA2F5E7D2FF0709000BB0A7E /* AppDependencies */; };
-		FA2F5E842FF0711800BB0A7E /* Login in Frameworks */ = {isa = PBXBuildFile; productRef = FA2F5E832FF0711800BB0A7E /* Login */; };
 		FA310E492FF16B6D0086E840 /* AllTests.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = FA310E482FF16B6D0086E840 /* AllTests.xctestplan */; };
+		FA929D402FF188C300D6F5E8 /* Home in Frameworks */ = {isa = PBXBuildFile; productRef = FA929D3F2FF188C300D6F5E8 /* Home */; };
+		FAE22FA32FF30F3100C75A31 /* LocalStorageService in Frameworks */ = {isa = PBXBuildFile; productRef = FAE22FA22FF30F3100C75A31 /* LocalStorageService */; };
+		FAE22FA52FF30F3E00C75A31 /* AppConfiguration in Frameworks */ = {isa = PBXBuildFile; productRef = FAE22FA42FF30F3E00C75A31 /* AppConfiguration */; };
+		FAE22FA72FF30F4600C75A31 /* NetworkLayer in Frameworks */ = {isa = PBXBuildFile; productRef = FAE22FA62FF30F4600C75A31 /* NetworkLayer */; };
+		FAE22FA92FF30F4D00C75A31 /* MovieListService in Frameworks */ = {isa = PBXBuildFile; productRef = FAE22FA82FF30F4D00C75A31 /* MovieListService */; };
+		FAE22FAB2FF30F4D00C75A31 /* MoviesService in Frameworks */ = {isa = PBXBuildFile; productRef = FAE22FAA2FF30F4D00C75A31 /* MoviesService */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,7 +36,6 @@
 /* Begin PBXFileReference section */
 		FA310E482FF16B6D0086E840 /* AllTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = AllTests.xctestplan; sourceTree = "<group>"; };
 		FA310E4A2FF174480086E840 /* DesignSystem */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = DesignSystem; sourceTree = "<group>"; };
-		FA4166EC2FF0863000F5ABE5 /* AppDependencies */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AppDependencies; sourceTree = "<group>"; };
 		FA9237D02FF086A00036D324 /* AnalyticsKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AnalyticsKit; sourceTree = "<group>"; };
 		FA9237D12FF086A00036D324 /* AppConfiguration */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AppConfiguration; sourceTree = "<group>"; };
 		FA9237D22FF086A00036D324 /* Core */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Core; sourceTree = "<group>"; };
@@ -80,8 +83,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FA2F5E842FF0711800BB0A7E /* Login in Frameworks */,
-				FA2F5E7E2FF0709000BB0A7E /* AppDependencies in Frameworks */,
+				FAE22FAB2FF30F4D00C75A31 /* MoviesService in Frameworks */,
+				FAE22FA92FF30F4D00C75A31 /* MovieListService in Frameworks */,
+				FAE22FA52FF30F3E00C75A31 /* AppConfiguration in Frameworks */,
+				FAE22FA72FF30F4600C75A31 /* NetworkLayer in Frameworks */,
+				FA929D402FF188C300D6F5E8 /* Home in Frameworks */,
+				FAE22FA32FF30F3100C75A31 /* LocalStorageService in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,7 +145,6 @@
 				FA310E4A2FF174480086E840 /* DesignSystem */,
 				FA9237D02FF086A00036D324 /* AnalyticsKit */,
 				FA9237D12FF086A00036D324 /* AppConfiguration */,
-				FA4166EC2FF0863000F5ABE5 /* AppDependencies */,
 				FA9237D22FF086A00036D324 /* Core */,
 				FA9237D32FF086A00036D324 /* Database */,
 				FA9237D42FF086A00036D324 /* Features */,
@@ -167,8 +173,12 @@
 			);
 			name = Innitial;
 			packageProductDependencies = (
-				FA2F5E7D2FF0709000BB0A7E /* AppDependencies */,
-				FA2F5E832FF0711800BB0A7E /* Login */,
+				FA929D3F2FF188C300D6F5E8 /* Home */,
+				FAE22FA22FF30F3100C75A31 /* LocalStorageService */,
+				FAE22FA42FF30F3E00C75A31 /* AppConfiguration */,
+				FAE22FA62FF30F4600C75A31 /* NetworkLayer */,
+				FAE22FA82FF30F4D00C75A31 /* MovieListService */,
+				FAE22FAA2FF30F4D00C75A31 /* MoviesService */,
 			);
 			productName = Innitial;
 			productReference = FABEB5F72FF04F2F0065F069 /* Innitial.app */;
@@ -634,13 +644,29 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		FA2F5E7D2FF0709000BB0A7E /* AppDependencies */ = {
+		FA929D3F2FF188C300D6F5E8 /* Home */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = AppDependencies;
+			productName = Home;
 		};
-		FA2F5E832FF0711800BB0A7E /* Login */ = {
+		FAE22FA22FF30F3100C75A31 /* LocalStorageService */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = Login;
+			productName = LocalStorageService;
+		};
+		FAE22FA42FF30F3E00C75A31 /* AppConfiguration */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppConfiguration;
+		};
+		FAE22FA62FF30F4600C75A31 /* NetworkLayer */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = NetworkLayer;
+		};
+		FAE22FA82FF30F4D00C75A31 /* MovieListService */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MovieListService;
+		};
+		FAE22FAA2FF30F4D00C75A31 /* MoviesService */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MoviesService;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

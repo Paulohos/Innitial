@@ -6,25 +6,19 @@
 //
 
 import SwiftUI
-import AppDependencies
-import LocalStoreService
-import Login
+import Home
 
 struct ContentView: View {
-    // O ViewModel é dono da tela; o app injeta o store (database) nele.
-    @State private var loginViewModel: LoginViewModel
-
-    init(dependencies: AppDependencies) {
-        _loginViewModel = State(
-            initialValue: LoginViewModel(store: dependencies.localStore)
-        )
-    }
+    // Fora de testes/previews o app roda no contexto "live" do swift-dependencies,
+    // então `HomeViewModel()` resolve o grafo real (config → network → services)
+    // sozinho — sem container nem bootstrap.
+    @State private var viewModel = HomeViewModel()
 
     var body: some View {
-        LoginView(viewModel: loginViewModel)
+        HomeView(viewModel: viewModel)
     }
 }
 
 #Preview {
-    ContentView(dependencies: .mock())
+    ContentView()
 }

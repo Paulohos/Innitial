@@ -1,6 +1,6 @@
 import Testing
 import Foundation
-@testable import LocalStoreService
+@testable import LocalStorageService
 
 private struct User: Codable, Equatable {
     let id: Int
@@ -85,10 +85,10 @@ extension StorageKeys {
     fileprivate var testToken: StorageKey<String> { .init("testToken", in: .keychain) }
 }
 
-@Suite struct LocalStoreServiceTests {
+@Suite struct LocalStorageServiceTests {
 
     @Test func typedKeyRoundTrips() throws {
-        let store = LocalStoreService.inMemory()
+        let store = LocalStorageService.inMemory()
         try store.save("a@b.com", for: \.testEmail)
         try store.save("secret-token", for: \.testToken)
 
@@ -97,7 +97,7 @@ extension StorageKeys {
     }
 
     @Test func backendsAreIsolated() throws {
-        let store = LocalStoreService.inMemory()
+        let store = LocalStorageService.inMemory()
         try store.save("from-defaults", for: \.testEmail)   // userDefaults
         try store.save("from-keychain", for: \.testToken)   // keychain
         #expect(try store.load(\.testEmail) == "from-defaults")
@@ -105,7 +105,7 @@ extension StorageKeys {
     }
 
     @Test func removeAllWipesEveryBackend() throws {
-        let store = LocalStoreService.inMemory()
+        let store = LocalStorageService.inMemory()
         let url = URL(string: "https://api.example.com/x")!
 
         try store.save("a@b.com", for: \.lastUsedLoginEmail)  // userDefaults
@@ -120,7 +120,7 @@ extension StorageKeys {
     }
 
     @Test func clearSessionKeepsConvenienceData() throws {
-        let store = LocalStoreService.inMemory()
+        let store = LocalStorageService.inMemory()
         let url = URL(string: "https://api.example.com/x")!
 
         try store.save("a@b.com", for: \.lastUsedLoginEmail)
@@ -142,7 +142,7 @@ extension StorageKeys {
     private let body = Data("{\"results\":[{\"id\":1,\"title\":\"Dune\"}]}".utf8)
 
     @Test func freshHitReturnsBytes() throws {
-        let store = LocalStoreService.inMemory()
+        let store = LocalStorageService.inMemory()
         let t0 = Date(timeIntervalSince1970: 1_000)
 
         try store.cacheResponse(body, for: url, now: t0)
@@ -152,7 +152,7 @@ extension StorageKeys {
     }
 
     @Test func staleEntryReturnsNilAndIsDeleted() throws {
-        let store = LocalStoreService.inMemory()
+        let store = LocalStorageService.inMemory()
         let t0 = Date(timeIntervalSince1970: 1_000)
 
         try store.cacheResponse(body, for: url, now: t0)
@@ -167,7 +167,7 @@ extension StorageKeys {
         struct Movie: Codable, Equatable { let id: Int; let title: String }
         struct Page: Codable, Equatable { let results: [Movie] }
 
-        let store = LocalStoreService.inMemory()
+        let store = LocalStorageService.inMemory()
         let t0 = Date(timeIntervalSince1970: 1_000)
 
         try store.cacheResponse(body, for: url, now: t0)
@@ -176,7 +176,7 @@ extension StorageKeys {
     }
 
     @Test func missingReturnsNil() throws {
-        let store = LocalStoreService.inMemory()
+        let store = LocalStorageService.inMemory()
         #expect(try store.cachedResponseData(for: url, maxAge: 60) == nil)
     }
 }
